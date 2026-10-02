@@ -7,14 +7,8 @@
   SECRETS_SCAN_OMIT_PATHS = "README.md"
 
 [functions]
-  included_files = [
-    "config.py",
-    "database.py",
-    "auth.py",
-    "notifier.py",
-    "api.py",
-    "scraper/**"
-  ]
+  node_bundler = "esbuild"
+
 
 # Route all API calls to the serverless function
 [[redirects]]

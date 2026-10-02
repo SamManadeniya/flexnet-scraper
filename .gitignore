@@ -8,6 +8,7 @@ __pycache__/
 *$py.class
 *.so
 .pytest_cache/
+node_modules/
 
 # Local Environment Secrets (NEVER COMMIT)
 .env

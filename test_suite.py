@@ -10,7 +10,8 @@ from auth import (
     decode_access_token,
 )
 from scraper.engine import is_vehicle_model_match
-from netlify.functions.server import handler as netlify_handler
+from mangum import Mangum
+netlify_handler = Mangum(app)
 
 class TestFlexnetSystem(unittest.TestCase):
 

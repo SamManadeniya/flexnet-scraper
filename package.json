@@ -1,0 +1,24 @@
+{
+  "name": "flexnet-scraper",
+  "version": "1.0.0",
+  "description": "High-performance web service and scraper for [Flexnet Japan](https://www.flexnet.co.jp/search) (~6,600+ vehicles). It allows users to search vehicles by criteria or direct URL via an interactive Web Form, scrapes comprehensive specs, downloads 30+ pristine high-resolution photos per vehicle, and automatically synchronizes them into **Supabase** with **Google Sheets webhook** notifications.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamManadeniya/flexnet-scraper.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SamManadeniya/flexnet-scraper/issues"
+  },
+  "homepage": "https://github.com/SamManadeniya/flexnet-scraper#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3"
+  }
+}
