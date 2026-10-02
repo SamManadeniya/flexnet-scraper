@@ -91,6 +91,7 @@ This project is fully structured for Netlify deployment:
 4. Add your Environment Variables in Netlify under **Site Configuration -> Environment variables**:
    - `SUPABASE_URL`: `https://rxbjexoxyfownnwxzbjn.supabase.co`
    - `SUPABASE_KEY`: `your_supabase_anon_or_service_role_key`
+   - `JWT_SECRET_KEY`: `your_secret_key_minimum_32_characters`
    - `GOOGLE_SHEETS_WEBHOOK_URL`: `your_webhook_url`
 5. Click **Deploy Site**!
 
@@ -106,16 +107,38 @@ netlify deploy --prod
 
 ---
 
+## 🔐 Authentication & Security
+
+The system includes production-grade authentication with password encryption and JWT session tokens:
+- **Default Administrator Credentials**:
+  - **Username**: `admin`
+  - **Password**: `admin123`
+- **Encrypted Password Storage**: All passwords are cryptographically salted and hashed using **bcrypt** (cost factor 12) or PBKDF2-HMAC-SHA256 (100,000 rounds) before persisting into the `public.users` table in Supabase. Plain text passwords are never stored or logged.
+- **Signed JWT Tokens**: Standards-compliant RFC 7519 tokens signed with HMAC-SHA256 (`HS256`).
+
+### Running Automated Test Suite
+To verify security, authentication, dynamic scraper model accuracy, and Netlify serverless handlers:
+```bash
+python test_suite.py
+```
+
+---
+
 ## 🔌 API Endpoints Reference
 
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/` | Web UI Form & Dashboard |
-| `GET` | `/health` | Service health & Supabase connection check |
-| `GET` | `/api/stats` | Count of vehicles stored in Supabase |
-| `POST` | `/api/scrape/search` | Search & scrape vehicles by query / filters (returns JSON array) |
-| `POST` | `/api/scrape/single` | Scrape a single vehicle URL on-demand |
-| `POST` | `/api/scrape/start` | Start full background crawl (bulk) |
-| `GET` | `/api/scrape/status` | Live status & progress percentage of bulk crawl |
-| `POST` | `/api/scrape/stop` | Gracefully cancel running scrape job |
-| `GET` | `/docs` | Interactive Swagger API documentation |
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/` | Web UI Form & Dashboard | No |
+| `POST` | `/api/auth/login` | Authenticate user & issue signed JWT | No |
+| `POST` | `/api/auth/register` | Register new user with hashed password | No |
+| `GET` | `/api/auth/me` | Fetch authenticated user profile | Yes (Bearer) |
+| `POST` | `/api/auth/logout` | Terminate user session | No |
+| `GET` | `/api/auth/users` | List registered accounts (omits hash) | Yes (Admin) |
+| `GET` | `/health` | Service health & Supabase connection check | No |
+| `GET` | `/api/stats` | Count of vehicles stored in Supabase | No |
+| `POST` | `/api/scrape/search` | Search & scrape vehicles by query / filters | Optional |
+| `POST` | `/api/scrape/single` | Scrape a single vehicle URL on-demand | Optional |
+| `POST` | `/api/scrape/start` | Start full background crawl (bulk) | Optional |
+| `GET` | `/api/scrape/status` | Live status & progress percentage of bulk crawl | No |
+| `POST` | `/api/scrape/stop` | Gracefully cancel running scrape job | Optional |
+| `GET` | `/docs` | Interactive Swagger API documentation | No |
