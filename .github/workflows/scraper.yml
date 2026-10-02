@@ -1,0 +1,43 @@
+name: 24/7 Automated Cloud Scraper
+
+on:
+  schedule:
+    # Run every 6 hours automatically in GitHub Cloud (00:00, 06:00, 12:00, 18:00 UTC)
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allows manual trigger anytime from GitHub Web UI
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute Full JDM Scraper & Sync to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://rxbjexoxyfownnwxzbjn.supabase.co' }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          GOOGLE_SHEETS_WEBHOOK_URL: ${{ secrets.GOOGLE_SHEETS_WEBHOOK_URL }}
+        run: |
+          echo "Starting 24/7 autonomous cloud scrape..."
+          python -c "
+          import asyncio
+          from scraper.engine import FlexnetScrapeEngine
+          async def run():
+              engine = FlexnetScrapeEngine(concurrency=3)
+              await engine.run_scrape(max_pages=5, scrape_details=True, incremental=True)
+          asyncio.run(run())
+          "

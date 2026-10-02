@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { scrapeSearchLive, scrapeSingleLive } = require('./lib/scraper.js');
 
 const SUPABASE_URL = (process.env.SUPABASE_URL || 'https://' + 'rxbjexoxyfownnwxzbjn.' + 'supabase.co').replace(/\/$/, '');
 const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
@@ -267,12 +268,34 @@ exports.handler = async (event, context) => {
   }
 
   // -------------------------------------------------------------
+  // -------------------------------------------------------------
   // Route: POST /api/scrape/search
   // -------------------------------------------------------------
   if (path === '/api/scrape/search' && method === 'POST') {
     const q = (body.query || '').trim();
     const limit = parseInt(body.limit || '40', 10);
 
+    // 1. Attempt live scrape directly from Flexnet Japan
+    try {
+      const liveResult = await scrapeSearchLive({ query: q, limit }, SUPABASE_URL, SUPABASE_KEY);
+      if (liveResult.success && liveResult.vehicles && liveResult.vehicles.length > 0) {
+        return jsonResponse(200, {
+          success: true,
+          count: liveResult.vehicles.length,
+          total_found: liveResult.vehicles.length,
+          vehicles: liveResult.vehicles,
+          query: liveResult.query,
+          translated_query: liveResult.translated_query,
+          search_url: liveResult.search_url,
+          saved_to_supabase: liveResult.saved_to_supabase || 0,
+          source: 'live_flexnet'
+        });
+      }
+    } catch (err) {
+      console.warn('Live search fallback to Supabase:', err);
+    }
+
+    // 2. Fallback to Supabase database
     let supabaseQuery = `${SUPABASE_URL}/rest/v1/flexnet_vehicles?select=*&order=id.desc&limit=${limit}`;
     if (q) {
       supabaseQuery += `&or=(title.ilike.*${encodeURIComponent(q)}*,tagline.ilike.*${encodeURIComponent(q)}*,model.ilike.*${encodeURIComponent(q)}*)`;
@@ -301,6 +324,25 @@ exports.handler = async (event, context) => {
   if (path === '/api/scrape/single' && method === 'POST') {
     const kanri = (body.kanri_code || '').trim();
     const url = (body.url || '').trim();
+
+    // 1. Attempt live scraping of the vehicle URL
+    if (url) {
+      try {
+        const liveSingle = await scrapeSingleLive(url, kanri, SUPABASE_URL, SUPABASE_KEY);
+        if (liveSingle.success && liveSingle.vehicle) {
+          return jsonResponse(200, {
+            success: true,
+            vehicle: liveSingle.vehicle,
+            saved_to_database: liveSingle.saved_to_database,
+            source: 'live_flexnet'
+          });
+        }
+      } catch (err) {
+        console.warn('Live single scrape error, checking database:', err);
+      }
+    }
+
+    // 2. Fallback to Supabase database
     try {
       let q = `${SUPABASE_URL}/rest/v1/flexnet_vehicles?select=*&limit=1`;
       if (kanri) q += `&kanri_code=eq.${encodeURIComponent(kanri)}`;
@@ -309,13 +351,14 @@ exports.handler = async (event, context) => {
       const res = await fetch(q, { headers: getSupabaseHeaders() });
       const cars = await res.json();
       if (cars && cars.length > 0) {
-        return jsonResponse(200, { success: true, vehicle: cars[0] });
+        return jsonResponse(200, { success: true, vehicle: cars[0], source: 'supabase' });
       }
-      return jsonResponse(404, { detail: 'Vehicle not found in database.' });
+      return jsonResponse(404, { detail: 'Vehicle not found on Flexnet or in database.' });
     } catch (err) {
       return jsonResponse(500, { detail: err.message });
     }
   }
+
 
   // Default Fallback
   return jsonResponse(404, { detail: `Not found: ${method} ${path}` });

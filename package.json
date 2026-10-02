@@ -19,7 +19,9 @@
   },
   "homepage": "https://github.com/SamManadeniya/flexnet-scraper#readme",
   "dependencies": {
+    "@netlify/functions": "^6.0.2",
     "bcryptjs": "^3.0.3",
+    "cheerio": "^1.2.0",
     "jsonwebtoken": "^9.0.3"
   }
 }
