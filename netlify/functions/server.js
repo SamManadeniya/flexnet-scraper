@@ -89,6 +89,65 @@ exports.handler = async (event, context) => {
   }
 
   // -------------------------------------------------------------
+  // Route: POST /api/auth/register
+  // -------------------------------------------------------------
+  if (path === '/api/auth/register' && method === 'POST') {
+    const username = (body.username || '').trim().toLowerCase();
+    const password = body.password || '';
+    const role = body.role || 'admin';
+
+    if (username.length < 3) {
+      return jsonResponse(400, { detail: 'Username must be at least 3 characters long.' });
+    }
+    if (password.length < 6) {
+      return jsonResponse(400, { detail: 'Password must be at least 6 characters long.' });
+    }
+
+    const existing = await getUserByUsername(username);
+    if (existing) {
+      return jsonResponse(409, { detail: 'A user with this username or email already exists.' });
+    }
+
+    const passwordHash = bcrypt.hashSync(password, 12);
+    try {
+      const createRes = await fetch(`${SUPABASE_URL}/rest/v1/users`, {
+        method: 'POST',
+        headers: getSupabaseHeaders(),
+        body: JSON.stringify({
+          username,
+          password_hash: passwordHash,
+          role
+        })
+      });
+      if (!createRes.ok) {
+        const errText = await createRes.text();
+        return jsonResponse(500, { detail: `Database failed to create user: ${errText}` });
+      }
+      const createdUsers = await createRes.json();
+      const newUser = (createdUsers && createdUsers.length > 0) ? createdUsers[0] : { username, role, id: 'user' };
+
+      const token = jwt.sign(
+        { sub: newUser.username, uid: newUser.id, role: newUser.role || 'admin' },
+        JWT_SECRET,
+        { expiresIn: '7d' }
+      );
+
+      return jsonResponse(200, {
+        success: true,
+        message: 'User registered successfully',
+        token,
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          role: newUser.role || 'admin'
+        }
+      });
+    } catch (err) {
+      return jsonResponse(500, { detail: `Error registering user: ${err.message}` });
+    }
+  }
+
+  // -------------------------------------------------------------
   // Route: POST /api/auth/login
   // -------------------------------------------------------------
   if (path === '/api/auth/login' && method === 'POST') {
@@ -230,6 +289,30 @@ exports.handler = async (event, context) => {
   }
 
   // -------------------------------------------------------------
+  // Route: GET /api/auth/users
+  // -------------------------------------------------------------
+  if (path === '/api/auth/users' && method === 'GET') {
+    const authHeader = event.headers.authorization || event.headers.Authorization || '';
+    if (!authHeader.startsWith('Bearer ')) {
+      return jsonResponse(401, { detail: 'Missing or invalid authentication token.' });
+    }
+    const token = authHeader.substring(7).trim();
+    try {
+      jwt.verify(token, JWT_SECRET);
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/users?select=id,username,role,created_at&order=created_at.desc`, {
+        headers: getSupabaseHeaders()
+      });
+      const users = await res.json();
+      return jsonResponse(200, {
+        success: true,
+        users: Array.isArray(users) ? users : []
+      });
+    } catch (err) {
+      return jsonResponse(401, { detail: 'Invalid or expired token.' });
+    }
+  }
+
+  // -------------------------------------------------------------
   // Route: GET /api/stats
   // -------------------------------------------------------------
   if (path === '/api/stats' && method === 'GET') {
@@ -268,6 +351,43 @@ exports.handler = async (event, context) => {
   }
 
   // -------------------------------------------------------------
+  // Route: GET /api/scrape/status
+  // -------------------------------------------------------------
+  if (path === '/api/scrape/status' && method === 'GET') {
+    return jsonResponse(200, {
+      is_running: false,
+      current_action: 'Cloud Ready (Netlify 24/7 Serverless)',
+      current_page: 1,
+      total_pages: 1,
+      progress_percent: 100,
+      scraped_count: 0,
+      new_cars_count: 0,
+      updated_count: 0,
+      errors_count: 0,
+      elapsed_seconds: 0,
+      last_error: null
+    });
+  }
+
+  // -------------------------------------------------------------
+  // Route: POST /api/scrape/start
+  // -------------------------------------------------------------
+  if (path === '/api/scrape/start' && method === 'POST') {
+    return jsonResponse(200, {
+      message: 'Scraper operates 24/7 automatically via Netlify Scheduled Functions (every 6 hours). For on-demand search, use POST /api/scrape/search.',
+      params: body
+    });
+  }
+
+  // -------------------------------------------------------------
+  // Route: POST /api/scrape/stop
+  // -------------------------------------------------------------
+  if (path === '/api/scrape/stop' && method === 'POST') {
+    return jsonResponse(200, {
+      message: 'Scraper runs in serverless event mode. No background process needed.'
+    });
+  }
+
   // -------------------------------------------------------------
   // Route: POST /api/scrape/search
   // -------------------------------------------------------------
