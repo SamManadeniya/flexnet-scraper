@@ -83,9 +83,49 @@ class RegisterRequest(BaseModel):
     password: str = Field(..., description="Password (minimum 6 characters)")
     role: Optional[str] = Field("admin", description="User role (admin or viewer)")
 
+class ResetPasswordRequest(BaseModel):
+    username: str = Field(..., description="Username to reset password for")
+    recovery_hint: str = Field(..., description="Master recovery key / hint (e.g. admin123)")
+    new_password: str = Field(..., description="New password (minimum 6 characters)")
+
 # -------------------------------------------------------------
 # Authentication Endpoints
 # -------------------------------------------------------------
+
+@app.post("/api/auth/reset-password")
+async def reset_password(req: ResetPasswordRequest):
+    """Reset user password using the master security hint (e.g. admin123)."""
+    username = req.username.strip().lower()
+    if not username:
+        raise HTTPException(status_code=400, detail="Username is required.")
+    
+    if len(req.new_password) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters long.")
+        
+    user = db.get_user_by_username(username)
+    if not user:
+        raise HTTPException(status_code=404, detail=f"User '{username}' was not found.")
+        
+    # Verify hint (accepts 'admin123' or existing password)
+    hint = req.recovery_hint.strip()
+    is_valid_hint = (
+        hint == "admin123" or
+        verify_password(hint, user.get("password_hash", ""))
+    )
+    if not is_valid_hint:
+        raise HTTPException(status_code=403, detail="Invalid recovery hint. Default hint is 'admin123'.")
+        
+    # Hash the new password with bcrypt
+    new_hash = hash_password(req.new_password)
+    success = db.update_user_password(username, new_hash)
+    if not success:
+        raise HTTPException(status_code=500, detail="Database failed to update password.")
+        
+    logger.info(f"Password reset successfully for user '{username}'.")
+    return {
+        "success": True,
+        "message": f"Password for '{username}' was successfully updated. You can now sign in."
+    }
 
 @app.post("/api/auth/register")
 async def register_user(req: RegisterRequest):
@@ -319,19 +359,33 @@ async def serve_index():
         "docs": "/docs"
     }
 
+@app.api_route("/favicon.ico", methods=["GET", "HEAD"], tags=["UI"])
+async def serve_favicon_ico():
+    path = public_dir / "favicon.ico"
+    if path.exists():
+        return FileResponse(path, media_type="image/x-icon")
+    raise HTTPException(status_code=404, detail="Favicon ICO not found")
+
+@app.api_route("/favicon.png", methods=["GET", "HEAD"], tags=["UI"])
+async def serve_favicon_png():
+    path = public_dir / "favicon.png"
+    if path.exists():
+        return FileResponse(path, media_type="image/png")
+    raise HTTPException(status_code=404, detail="Favicon PNG not found")
+
+@app.api_route("/apple-touch-icon.png", methods=["GET", "HEAD"], tags=["UI"])
+async def serve_apple_touch_icon():
+    path = public_dir / "apple-touch-icon.png"
+    if path.exists():
+        return FileResponse(path, media_type="image/png")
+    raise HTTPException(status_code=404, detail="Apple touch icon not found")
+
 @app.api_route("/favicon.svg", methods=["GET", "HEAD"], tags=["UI"])
 async def serve_favicon():
     path = public_dir / "favicon.svg"
     if path.exists():
         return FileResponse(path, media_type="image/svg+xml")
-    raise HTTPException(status_code=404, detail="Favicon not found")
-
-@app.api_route("/favicon.ico", methods=["GET", "HEAD"], tags=["UI"])
-async def serve_favicon_ico():
-    path = public_dir / "favicon.svg"
-    if path.exists():
-        return FileResponse(path, media_type="image/svg+xml")
-    raise HTTPException(status_code=404, detail="Favicon not found")
+    raise HTTPException(status_code=404, detail="Favicon SVG not found")
 
 @app.api_route("/logo.svg", methods=["GET", "HEAD"], tags=["UI"])
 async def serve_logo():
@@ -339,6 +393,24 @@ async def serve_logo():
     if path.exists():
         return FileResponse(path, media_type="image/svg+xml")
     raise HTTPException(status_code=404, detail="Logo not found")
+
+@app.api_route("/background.webp", methods=["GET", "HEAD"], tags=["UI"])
+async def serve_bg_webp():
+    path = public_dir / "background.webp"
+    if path.exists():
+        return FileResponse(path, media_type="image/webp")
+    # Fallback to jpg
+    jpg_path = public_dir / "background.jpg"
+    if jpg_path.exists():
+        return FileResponse(jpg_path, media_type="image/jpeg")
+    raise HTTPException(status_code=404, detail="Background not found")
+
+@app.api_route("/background.jpg", methods=["GET", "HEAD"], tags=["UI"])
+async def serve_bg_jpg():
+    path = public_dir / "background.jpg"
+    if path.exists():
+        return FileResponse(path, media_type="image/jpeg")
+    raise HTTPException(status_code=404, detail="Background not found")
 
 if public_dir.exists():
     app.mount("/static", StaticFiles(directory=str(public_dir)), name="static")

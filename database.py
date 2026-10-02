@@ -378,6 +378,21 @@ class DatabaseClient:
             raise e
         return None
 
+    def update_user_password(self, username: str, new_password_hash: str) -> bool:
+        """Update password hash for an existing user."""
+        if not self.client or not username or not new_password_hash:
+            return False
+        try:
+            res = self.client.table("users").update({
+                "password_hash": new_password_hash
+            }).eq("username", username.strip().lower()).execute()
+            if res.data:
+                logger.info(f"Password hash updated for user '{username}'.")
+                return True
+        except Exception as e:
+            logger.error(f"Error updating password for user '{username}': {e}")
+        return False
+
     def list_users(self) -> List[Dict[str, Any]]:
         """List registered users (excluding sensitive password hash)."""
         if not self.client:

@@ -115,7 +115,56 @@ class TestFlexnetSystem(unittest.TestCase):
         self.assertTrue(is_match)
 
     # -------------------------------------------------------------
-    # 4. Netlify Serverless Function Handler Test
+    # 4. Password Reset & Security Hint Tests
+    # -------------------------------------------------------------
+    def test_auth_reset_password_invalid_hint(self):
+        res = self.client.post("/api/auth/reset-password", json={
+            "username": "admin",
+            "recovery_hint": "wrong_hint_xyz",
+            "new_password": "NewSecretPassword2026!"
+        })
+        self.assertEqual(res.status_code, 403)
+        self.assertIn("Invalid recovery hint", res.json().get("detail", ""))
+
+    def test_auth_reset_password_success(self):
+        # Reset password to temporary password using admin123 hint
+        res = self.client.post("/api/auth/reset-password", json={
+            "username": "admin",
+            "recovery_hint": "admin123",
+            "new_password": "TempAdminPass123!"
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.json().get("success"))
+
+        # Verify new password logs in
+        login_res = self.client.post("/api/auth/login", json={"username": "admin", "password": "TempAdminPass123!"})
+        self.assertEqual(login_res.status_code, 200)
+
+        # Restore admin password back to admin123 for idempotent test runs
+        restore_res = self.client.post("/api/auth/reset-password", json={
+            "username": "admin",
+            "recovery_hint": "admin123",
+            "new_password": "admin123"
+        })
+        self.assertEqual(restore_res.status_code, 200)
+
+    # -------------------------------------------------------------
+    # 5. Asset & Favicon Routes Tests
+    # -------------------------------------------------------------
+    def test_favicon_and_background_assets_served(self):
+        for path, expected_content_type in [
+            ("/favicon.ico", "image/x-icon"),
+            ("/favicon.png", "image/png"),
+            ("/apple-touch-icon.png", "image/png"),
+            ("/background.webp", "image/webp"),
+            ("/background.jpg", "image/jpeg"),
+        ]:
+            res = self.client.get(path)
+            self.assertEqual(res.status_code, 200, f"Path {path} returned {res.status_code}")
+            self.assertIn(expected_content_type, res.headers.get("content-type", ""))
+
+    # -------------------------------------------------------------
+    # 6. Netlify Serverless Function Handler Test
     # -------------------------------------------------------------
     def test_netlify_serverless_handler(self):
         event = {
