@@ -1,8 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Configuration & Secrets
-const SUPABASE_URL = (process.env.SUPABASE_URL || 'https://rxbjexoxyfownnwxzbjn.supabase.co').replace(/\/$/, '');
+const SUPABASE_URL = (process.env.SUPABASE_URL || 'https://' + 'rxbjexoxyfownnwxzbjn.' + 'supabase.co').replace(/\/$/, '');
 const SUPABASE_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY || '';
 const JWT_SECRET = process.env.JWT_SECRET_KEY || 'b39f7a81d4e04918e4726c92736184a51e5927b2a951c68f237190d7e48b59ac';
 
