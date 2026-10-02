@@ -89,7 +89,7 @@ This project is fully structured for Netlify deployment:
    - **Publish directory**: `public`
    - **Functions directory**: `netlify/functions`
 4. Add your Environment Variables in Netlify under **Site Configuration -> Environment variables**:
-   - `SUPABASE_URL`: `https://rxbjexoxyfownnwxzbjn.supabase.co`
+   - `SUPABASE_URL`: `https://your-project-id.supabase.co`
    - `SUPABASE_KEY`: `your_supabase_anon_or_service_role_key`
    - `JWT_SECRET_KEY`: `your_secret_key_minimum_32_characters`
    - `GOOGLE_SHEETS_WEBHOOK_URL`: `your_webhook_url`
