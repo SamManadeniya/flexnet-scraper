@@ -3,8 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Flexnet Japan Vehicle Scraper | JDM Hunter</title>
+  <title>Flexnet Japan Vehicle Scraper | JDM Intelligence</title>
   <meta name="description" content="Search, scrape and synchronize Japanese Land Cruisers, Hiaces, and custom vehicles from Flexnet Japan directly into Supabase and Google Sheets.">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="alternate icon" href="/favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -981,20 +983,359 @@
     .auth-footer-note a:hover {
       text-decoration: underline;
     }
+
+    /* URL Header / Brand SVG Logo */
+    .brand-svg-logo {
+      width: 42px;
+      height: 42px;
+      filter: drop-shadow(0 0 12px rgba(6, 182, 212, 0.45));
+      transition: transform 0.3s ease;
+    }
+    .brand-svg-logo:hover {
+      transform: scale(1.08) rotate(4deg);
+    }
+    .jdm-kanji-badge {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.16);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      color: var(--primary);
+      margin-left: 8px;
+      vertical-align: middle;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Dedicated Full-Screen Login Gatekeeper Screen */
+    .gatekeeper-screen {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px 48px;
+      position: relative;
+      overflow: hidden;
+      background: 
+        radial-gradient(circle at 50% 15%, rgba(6, 182, 212, 0.14) 0%, transparent 55%),
+        radial-gradient(circle at 85% 75%, rgba(245, 158, 11, 0.09) 0%, transparent 45%),
+        linear-gradient(180deg, #050811 0%, #0a101f 100%);
+    }
+
+    .gatekeeper-bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 40px 40px;
+      mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 80%);
+      -webkit-mask-image: radial-gradient(circle at 50% 50%, black 40%, transparent 80%);
+      pointer-events: none;
+    }
+
+    .gatekeeper-card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(13, 20, 36, 0.88);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid rgba(6, 182, 212, 0.35);
+      border-radius: 24px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75),
+                  0 0 45px rgba(6, 182, 212, 0.15),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 10;
+      animation: gatekeeperEntrance 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes gatekeeperEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(22px) scale(0.97);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .gatekeeper-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .gatekeeper-emblem-wrap {
+      width: 84px;
+      height: 84px;
+      margin: 0 auto 14px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.25) 0%, transparent 70%);
+    }
+
+    .gatekeeper-emblem-wrap img {
+      width: 72px;
+      height: 72px;
+      filter: drop-shadow(0 0 18px rgba(6, 182, 212, 0.65));
+      animation: floatGkLogo 4s ease-in-out infinite;
+    }
+
+    @keyframes floatGkLogo {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .gatekeeper-status-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 4px 12px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #6ee7b7;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 12px;
+    }
+
+    .gatekeeper-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #ffffff 30%, #38bdf8 70%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 6px;
+    }
+
+    .gatekeeper-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.45;
+    }
+
+    .gatekeeper-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .gatekeeper-tab {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 13px;
+      border-radius: 9px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.25s;
+    }
+
+    .gatekeeper-tab.active {
+      background: linear-gradient(135deg, var(--primary), #0284c7);
+      color: #080c15;
+      font-weight: 700;
+      box-shadow: 0 4px 15px var(--primary-glow);
+    }
+
+    .gatekeeper-btn-submit {
+      width: 100%;
+      padding: 13px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), #2563eb);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(6, 182, 212, 0.35);
+      transition: all 0.25s;
+    }
+
+    .gatekeeper-btn-submit:hover {
+      background: linear-gradient(135deg, #38bdf8, #1d4ed8);
+      box-shadow: 0 10px 28px rgba(6, 182, 212, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .btn-demo-quick {
+      width: 100%;
+      margin-top: 14px;
+      padding: 10px;
+      border-radius: 10px;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px dashed rgba(245, 158, 11, 0.45);
+      color: #fbbf24;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-demo-quick:hover {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: #f59e0b;
+      transform: translateY(-1px);
+    }
+
+    .gatekeeper-pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 24px;
+      max-width: 480px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .gatekeeper-pill {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: rgba(17, 24, 39, 0.65);
+      border: 1px solid var(--border-color);
+      padding: 6px 12px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .app-dashboard-wrap {
+      animation: dashboardFadeIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    @keyframes dashboardFadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
+  <!-- ========================================================= -->
+  <!-- 1. FULL-SCREEN DEDICATED LOGIN GATEKEEPER SCREEN          -->
+  <!-- ========================================================= -->
+  <div id="authGatekeeperScreen" class="gatekeeper-screen">
+    <div class="gatekeeper-bg-grid"></div>
+
+    <div class="gatekeeper-card">
+      <div class="gatekeeper-header">
+        <div class="gatekeeper-emblem-wrap">
+          <img src="/favicon.svg" alt="Flexnet 4WD Emblem">
+        </div>
+        <div class="gatekeeper-status-tag">
+          <span class="status-dot"></span> 256-Bit Encrypted Portal
+        </div>
+        <h1 class="gatekeeper-title">FLEXNET HUNTER</h1>
+        <p class="gatekeeper-sub">
+          Japanese 4WD overland vehicle scraper, translation engine, and Supabase cloud intelligence.
+        </p>
+      </div>
+
+      <!-- Sign In / Register Tabs -->
+      <div class="gatekeeper-tabs">
+        <button type="button" id="gkTabLogin" class="gatekeeper-tab active" onclick="switchGkTab('login')">
+          <i class="fa-solid fa-right-to-bracket"></i> Sign In
+        </button>
+        <button type="button" id="gkTabRegister" class="gatekeeper-tab" onclick="switchGkTab('register')">
+          <i class="fa-solid fa-user-plus"></i> Create Account
+        </button>
+      </div>
+
+      <!-- Alert Notification Banner -->
+      <div id="gkAlert" class="auth-alert" style="display: none;"></div>
+
+      <!-- Form -->
+      <form id="gkAuthForm" onsubmit="handleGkAuthSubmit(event)">
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label class="form-label" for="gkUsername">Username or Email</label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="gkUsername" class="form-input icon-input" placeholder="e.g. admin or user@flexnet.jp" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 18px;">
+          <label class="form-label" for="gkPassword">Password</label>
+          <div class="input-icon-wrap">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="gkPassword" class="form-input icon-input" placeholder="Min. 6 characters" required autocomplete="current-password">
+            <button type="button" class="btn-pwd-toggle" onclick="toggleGkPassword()"><i class="fa-solid fa-eye" id="gkPwdIcon"></i></button>
+          </div>
+        </div>
+
+        <button type="submit" id="gkSubmitBtn" class="gatekeeper-btn-submit">
+          <i class="fa-solid fa-shield-halved"></i> <span id="gkSubmitText">Access Scraper Console</span>
+        </button>
+
+        <!-- 1-Click Instant Demo Button for effortless testing -->
+        <button type="button" class="btn-demo-quick" onclick="quickDemoLogin()">
+          <i class="fa-solid fa-bolt"></i> 1-Click Admin Access (Demo: admin / admin123)
+        </button>
+      </form>
+
+      <div class="auth-footer-note">
+        <span id="gkSwitchNote">Don't have an account? <a href="#" onclick="switchGkTab('register'); return false;">Register new account</a></span>
+      </div>
+    </div>
+
+    <!-- Feature Highlights Below Card -->
+    <div class="gatekeeper-pills-row">
+      <div class="gatekeeper-pill"><i class="fa-solid fa-bolt" style="color: var(--primary);"></i> Live Flexnet Japan Scraper</div>
+      <div class="gatekeeper-pill"><i class="fa-solid fa-language" style="color: #a855f7;"></i> Auto English Translation</div>
+      <div class="gatekeeper-pill"><i class="fa-solid fa-database" style="color: #10b981;"></i> Supabase Cloud Sync</div>
+      <div class="gatekeeper-pill"><i class="fa-solid fa-lock" style="color: var(--accent);"></i> Bcrypt Salted Security</div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- 2. MAIN SCRAPER CONSOLE DASHBOARD                         -->
+  <!-- ========================================================= -->
+  <div class="container app-dashboard-wrap" id="appMainContent" style="display: none;">
     <!-- Header -->
     <header>
       <div class="logo-group">
-        <div class="logo-icon">
-          <i class="fa-solid fa-car-side"></i>
+        <div class="logo-icon" style="background: transparent; box-shadow: none; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center;">
+          <img src="/favicon.svg" alt="Flexnet 4WD Emblem" class="brand-svg-logo">
         </div>
         <div>
-          <h1 class="brand-title">FLEXNET HUNTER</h1>
-          <p class="brand-subtitle">Japanese Vehicle Scraper & Supabase Sync</p>
+          <h1 class="brand-title">FLEXNET HUNTER <span class="jdm-kanji-badge">フレックス 4WD</span></h1>
+          <p class="brand-subtitle">Japanese Vehicle Scraper &amp; Supabase Intelligence</p>
         </div>
       </div>
       <div class="system-status">
@@ -1006,13 +1347,8 @@
           <i class="fa-solid fa-table-list"></i>
           <span id="dbVehicleCount">-- vehicles</span>
         </div>
-        <!-- Authentication Pill -->
-        <div id="authGuestView">
-          <button class="btn-auth-pill" onclick="openAuthModal('login')">
-            <i class="fa-solid fa-arrow-right-to-bracket"></i> Sign In
-          </button>
-        </div>
-        <div id="authUserView" style="display: none;" class="auth-user-pill">
+        <!-- Active User Pill with Sign Out Button -->
+        <div id="authUserView" class="auth-user-pill">
           <i class="fa-solid fa-circle-user" style="color: var(--primary);"></i>
           <span id="authUsernameText">admin</span>
           <span class="auth-role-tag" id="authUserRole">admin</span>
@@ -1432,16 +1768,140 @@
     }
 
     function renderLoggedInState(user) {
-      document.getElementById('authGuestView').style.display = 'none';
+      const gk = document.getElementById('authGatekeeperScreen');
+      if (gk) gk.style.display = 'none';
+
+      const dashboard = document.getElementById('appMainContent');
+      if (dashboard) {
+        dashboard.style.display = 'block';
+        dashboard.classList.add('app-dashboard-wrap');
+      }
+
       const userView = document.getElementById('authUserView');
-      userView.style.display = 'inline-flex';
-      document.getElementById('authUsernameText').innerText = user.username || 'admin';
-      document.getElementById('authUserRole').innerText = user.role || 'admin';
+      if (userView) {
+        userView.style.display = 'inline-flex';
+        document.getElementById('authUsernameText').innerText = user.username || 'admin';
+        document.getElementById('authUserRole').innerText = user.role || 'admin';
+      }
+
+      // Load DB stats for authenticated user
+      loadStats();
     }
 
     function renderLoggedOutState() {
-      document.getElementById('authGuestView').style.display = 'block';
-      document.getElementById('authUserView').style.display = 'none';
+      const gk = document.getElementById('authGatekeeperScreen');
+      if (gk) gk.style.display = 'flex';
+
+      const dashboard = document.getElementById('appMainContent');
+      if (dashboard) dashboard.style.display = 'none';
+
+      const userView = document.getElementById('authUserView');
+      if (userView) userView.style.display = 'none';
+    }
+
+    // -------------------------------------------------------------
+    // Gatekeeper Login Screen Actions
+    // -------------------------------------------------------------
+    let currentGkMode = 'login'; // 'login' or 'register'
+
+    function switchGkTab(mode) {
+      currentGkMode = mode;
+      clearGkAlert();
+      const tabLogin = document.getElementById('gkTabLogin');
+      const tabRegister = document.getElementById('gkTabRegister');
+      const submitText = document.getElementById('gkSubmitText');
+      const switchNote = document.getElementById('gkSwitchNote');
+
+      if (mode === 'login') {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        submitText.innerText = 'Access Scraper Console';
+        switchNote.innerHTML = 'Don\'t have an account? <a href="#" onclick="switchGkTab(\'register\'); return false;">Register new account</a>';
+      } else {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        submitText.innerText = 'Create Encrypted Account';
+        switchNote.innerHTML = 'Already registered? <a href="#" onclick="switchGkTab(\'login\'); return false;">Sign in to account</a>';
+      }
+    }
+
+    function toggleGkPassword() {
+      const pwd = document.getElementById('gkPassword');
+      const icon = document.getElementById('gkPwdIcon');
+      if (pwd.type === 'password') {
+        pwd.type = 'text';
+        icon.className = 'fa-solid fa-eye-slash';
+      } else {
+        pwd.type = 'password';
+        icon.className = 'fa-solid fa-eye';
+      }
+    }
+
+    function showGkAlert(msg, type = 'error') {
+      const el = document.getElementById('gkAlert');
+      el.className = `auth-alert ${type}`;
+      el.innerHTML = `<i class="fa-solid fa-${type === 'error' ? 'circle-exclamation' : 'circle-check'}"></i> <span>${msg}</span>`;
+      el.style.display = 'flex';
+    }
+
+    function clearGkAlert() {
+      const el = document.getElementById('gkAlert');
+      el.style.display = 'none';
+      el.innerText = '';
+    }
+
+    async function handleGkAuthSubmit(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      clearGkAlert();
+      const username = document.getElementById('gkUsername').value.trim();
+      const password = document.getElementById('gkPassword').value;
+      const submitBtn = document.getElementById('gkSubmitBtn');
+      const originalText = document.getElementById('gkSubmitText').innerText;
+
+      if (!username || !password) {
+        showGkAlert('Please enter both username and password.');
+        return;
+      }
+      if (password.length < 6) {
+        showGkAlert('Password must be at least 6 characters long.');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      document.getElementById('gkSubmitText').innerText = 'Authenticating...';
+
+      const endpoint = currentGkMode === 'login' ? '/api/auth/login' : '/api/auth/register';
+
+      try {
+        const res = await fetch(`${API_BASE}${endpoint}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.token) {
+          localStorage.setItem(AUTH_TOKEN_KEY, data.token);
+          showGkAlert(currentGkMode === 'login' ? 'Authentication successful! Loading console...' : 'Account created & authenticated! Loading console...', 'success');
+          setTimeout(() => {
+            renderLoggedInState(data.user);
+          }, 450);
+        } else {
+          showGkAlert(data.detail || data.message || 'Authentication failed. Please verify credentials.');
+        }
+      } catch (err) {
+        showGkAlert(`Network connection error: ${err.message}`);
+      } finally {
+        submitBtn.disabled = false;
+        document.getElementById('gkSubmitText').innerText = originalText;
+      }
+    }
+
+    function quickDemoLogin() {
+      switchGkTab('login');
+      document.getElementById('gkUsername').value = 'admin';
+      document.getElementById('gkPassword').value = 'admin123';
+      handleGkAuthSubmit();
     }
 
     function openAuthModal(mode = 'login') {
@@ -1565,6 +2025,7 @@
       }
       localStorage.removeItem(AUTH_TOKEN_KEY);
       renderLoggedOutState();
+      showGkAlert('Session signed out securely.', 'success');
     }
 
     // Load Initial DB Stats & Auth Check
@@ -1580,7 +2041,8 @@
         console.warn('Could not fetch stats:', err);
       }
     }
-    loadStats();
+
+    // Primary Entrypoint: check authentication gatekeeper
     checkAuthStatus();
 
     function setQuery(model) {

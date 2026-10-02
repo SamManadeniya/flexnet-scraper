@@ -319,6 +319,27 @@ async def serve_index():
         "docs": "/docs"
     }
 
+@app.api_route("/favicon.svg", methods=["GET", "HEAD"], tags=["UI"])
+async def serve_favicon():
+    path = public_dir / "favicon.svg"
+    if path.exists():
+        return FileResponse(path, media_type="image/svg+xml")
+    raise HTTPException(status_code=404, detail="Favicon not found")
+
+@app.api_route("/favicon.ico", methods=["GET", "HEAD"], tags=["UI"])
+async def serve_favicon_ico():
+    path = public_dir / "favicon.svg"
+    if path.exists():
+        return FileResponse(path, media_type="image/svg+xml")
+    raise HTTPException(status_code=404, detail="Favicon not found")
+
+@app.api_route("/logo.svg", methods=["GET", "HEAD"], tags=["UI"])
+async def serve_logo():
+    path = public_dir / "logo.svg"
+    if path.exists():
+        return FileResponse(path, media_type="image/svg+xml")
+    raise HTTPException(status_code=404, detail="Logo not found")
+
 if public_dir.exists():
     app.mount("/static", StaticFiles(directory=str(public_dir)), name="static")
 
