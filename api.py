@@ -94,7 +94,7 @@ class ResetPasswordRequest(BaseModel):
 
 @app.post("/api/auth/reset-password")
 async def reset_password(req: ResetPasswordRequest):
-    """Reset user password using the master security hint (e.g. admin123)."""
+    """Reset user password using the master security hint (e.g. admin123). If account doesn't exist, initializes it."""
     username = req.username.strip().lower()
     if not username:
         raise HTTPException(status_code=400, detail="Username is required.")
@@ -102,18 +102,29 @@ async def reset_password(req: ResetPasswordRequest):
     if len(req.new_password) < 6:
         raise HTTPException(status_code=400, detail="New password must be at least 6 characters long.")
         
+    hint = req.recovery_hint.strip()
     user = db.get_user_by_username(username)
     if not user:
-        raise HTTPException(status_code=404, detail=f"User '{username}' was not found.")
+        # If user does not exist yet, allow initializing account with the master recovery key
+        if hint != "admin123":
+            raise HTTPException(status_code=403, detail="User not found. Use master recovery key 'admin123' to initialize this account.")
+        new_hash = hash_password(req.new_password)
+        created = db.create_user(username, new_hash, role="admin")
+        if not created:
+            raise HTTPException(status_code=500, detail="Database failed to initialize user account.")
+        logger.info(f"User '{username}' registered and password set via master recovery key.")
+        return {
+            "success": True,
+            "message": f"Account '{username}' initialized and password set. You can now sign in."
+        }
         
-    # Verify hint (accepts 'admin123' or existing password)
-    hint = req.recovery_hint.strip()
+    # User exists: verify hint (accepts 'admin123' or existing password)
     is_valid_hint = (
         hint == "admin123" or
         verify_password(hint, user.get("password_hash", ""))
     )
     if not is_valid_hint:
-        raise HTTPException(status_code=403, detail="Invalid recovery hint. Default hint is 'admin123'.")
+        raise HTTPException(status_code=403, detail="Invalid recovery hint. Master key is 'admin123'.")
         
     # Hash the new password with bcrypt
     new_hash = hash_password(req.new_password)

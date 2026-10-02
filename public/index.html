@@ -249,10 +249,10 @@
       z-index: 2;
     }
 
-    input[type="text"], input[type="number"] {
+    input[type="text"], input[type="number"], input[type="password"], .form-input {
       width: 100%;
       padding: 12px 14px 12px 40px;
-      background: rgba(10, 15, 26, 0.8);
+      background: rgba(10, 15, 26, 0.85);
       border: 1px solid var(--border-color);
       border-radius: 10px;
       color: #fff;
@@ -260,6 +260,15 @@
       font-family: inherit;
       outline: none;
       transition: all 0.2s ease;
+      -webkit-appearance: none;
+      appearance: none;
+      box-sizing: border-box;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus, input[type="password"]:focus, .form-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.25);
+      background: rgba(15, 23, 42, 0.95);
     }
 
     select {
@@ -945,6 +954,7 @@
     .form-input.icon-input {
       padding-left: 36px;
       padding-right: 36px;
+      height: 44px;
     }
     .btn-pwd-toggle {
       position: absolute;
@@ -1298,7 +1308,7 @@
           <label class="form-label" for="gkUsername">Username or Email</label>
           <div class="input-icon-wrap">
             <i class="fa-solid fa-user"></i>
-            <input type="text" id="gkUsername" class="form-input icon-input" placeholder="e.g. admin or user@flexnet.jp" required autocomplete="username">
+            <input type="text" id="gkUsername" class="form-input icon-input" required autocomplete="username">
           </div>
         </div>
 
@@ -1306,18 +1316,13 @@
           <label class="form-label" for="gkPassword">Password</label>
           <div class="input-icon-wrap">
             <i class="fa-solid fa-lock"></i>
-            <input type="password" id="gkPassword" class="form-input icon-input" placeholder="Min. 6 characters" required autocomplete="current-password">
+            <input type="password" id="gkPassword" class="form-input icon-input" required autocomplete="current-password">
             <button type="button" class="btn-pwd-toggle" onclick="toggleGkPassword()"><i class="fa-solid fa-eye" id="gkPwdIcon"></i></button>
           </div>
         </div>
 
         <button type="submit" id="gkSubmitBtn" class="gatekeeper-btn-submit">
           <i class="fa-solid fa-shield-halved"></i> <span id="gkSubmitText">Access Scraper Console</span>
-        </button>
-
-        <!-- 1-Click Instant Demo Button for effortless testing -->
-        <button type="button" class="btn-demo-quick" onclick="quickDemoLogin()">
-          <i class="fa-solid fa-bolt"></i> 1-Click Admin Access (Demo: admin / admin123)
         </button>
 
         <div class="auth-footer-note">
@@ -1331,18 +1336,15 @@
           <label class="form-label" for="gkResetUsername">Username</label>
           <div class="input-icon-wrap">
             <i class="fa-solid fa-user"></i>
-            <input type="text" id="gkResetUsername" class="form-input icon-input" placeholder="Username to reset (e.g. admin)" required autocomplete="username">
+            <input type="text" id="gkResetUsername" class="form-input icon-input" required autocomplete="username">
           </div>
         </div>
 
         <div class="form-group" style="margin-bottom: 14px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <label class="form-label" for="gkResetHint" style="margin-bottom: 0;">Recovery Key / Hint</label>
-            <span style="font-size: 11px; color: var(--primary); font-weight: 600;">Hint: admin123</span>
-          </div>
+          <label class="form-label" for="gkResetHint">Master Recovery Key / Hint</label>
           <div class="input-icon-wrap">
             <i class="fa-solid fa-shield-halved"></i>
-            <input type="text" id="gkResetHint" class="form-input icon-input" placeholder="Enter recovery hint (admin123)" required>
+            <input type="text" id="gkResetHint" class="form-input icon-input" required>
           </div>
         </div>
 
@@ -1350,7 +1352,7 @@
           <label class="form-label" for="gkResetNewPassword">New Password</label>
           <div class="input-icon-wrap">
             <i class="fa-solid fa-lock"></i>
-            <input type="password" id="gkResetNewPassword" class="form-input icon-input" placeholder="Min. 6 characters" required autocomplete="new-password">
+            <input type="password" id="gkResetNewPassword" class="form-input icon-input" required autocomplete="new-password">
             <button type="button" class="btn-pwd-toggle" onclick="toggleGkResetPassword()"><i class="fa-solid fa-eye" id="gkResetPwdIcon"></i></button>
           </div>
         </div>
@@ -1746,18 +1748,15 @@
             <label class="form-label" for="modalResetUsername">Username</label>
             <div class="input-icon-wrap">
               <i class="fa-solid fa-user"></i>
-              <input type="text" id="modalResetUsername" class="form-input icon-input" placeholder="e.g. admin" required autocomplete="username">
+              <input type="text" id="modalResetUsername" class="form-input icon-input" required autocomplete="username">
             </div>
           </div>
 
           <div class="form-group" style="margin-bottom: 14px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-              <label class="form-label" for="modalResetHint" style="margin-bottom: 0;">Recovery Key / Hint</label>
-              <span style="font-size: 11px; color: var(--primary); font-weight: 600;">Hint: admin123</span>
-            </div>
+            <label class="form-label" for="modalResetHint">Master Recovery Key / Hint</label>
             <div class="input-icon-wrap">
               <i class="fa-solid fa-shield-halved"></i>
-              <input type="text" id="modalResetHint" class="form-input icon-input" placeholder="Enter hint: admin123" required>
+              <input type="text" id="modalResetHint" class="form-input icon-input" required>
             </div>
           </div>
 
@@ -1765,7 +1764,7 @@
             <label class="form-label" for="modalResetNewPassword">New Password</label>
             <div class="input-icon-wrap">
               <i class="fa-solid fa-lock"></i>
-              <input type="password" id="modalResetNewPassword" class="form-input icon-input" placeholder="Min. 6 characters" required autocomplete="new-password">
+              <input type="password" id="modalResetNewPassword" class="form-input icon-input" required autocomplete="new-password">
               <button type="button" class="btn-pwd-toggle" onclick="toggleModalResetPassword()"><i class="fa-solid fa-eye" id="modalResetPwdIcon"></i></button>
             </div>
           </div>
@@ -1878,9 +1877,9 @@
         tabLogin.classList.remove('active');
         loginForm.style.display = 'none';
         resetForm.style.display = 'block';
-        const userVal = document.getElementById('gkUsername').value.trim() || 'admin';
+        const userVal = document.getElementById('gkUsername').value.trim();
         document.getElementById('gkResetUsername').value = userVal;
-        document.getElementById('gkResetHint').value = 'admin123';
+        document.getElementById('gkResetHint').value = '';
         document.getElementById('gkResetNewPassword').value = '';
       }
     }
@@ -2024,9 +2023,9 @@
     // Modal Password Reset (Dashboard)
     function openResetModal() {
       document.getElementById('modalResetAlert').style.display = 'none';
-      const currentUser = document.getElementById('authUsernameText').innerText || 'admin';
+      const currentUser = document.getElementById('authUsernameText').innerText || '';
       document.getElementById('modalResetUsername').value = currentUser;
-      document.getElementById('modalResetHint').value = 'admin123';
+      document.getElementById('modalResetHint').value = '';
       document.getElementById('modalResetNewPassword').value = '';
       document.getElementById('resetModal').style.display = 'flex';
       setTimeout(() => document.getElementById('modalResetNewPassword').focus(), 100);

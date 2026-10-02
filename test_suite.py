@@ -148,6 +148,28 @@ class TestFlexnetSystem(unittest.TestCase):
         })
         self.assertEqual(restore_res.status_code, 200)
 
+    def test_auth_reset_password_initializes_new_user(self):
+        new_user = f"tester_{int(datetime.now(timezone.utc).timestamp())}"
+        res = self.client.post("/api/auth/reset-password", json={
+            "username": new_user,
+            "recovery_hint": "admin123",
+            "new_password": "InitialPassword2026!"
+        })
+        self.assertEqual(res.status_code, 200)
+        self.assertTrue(res.json().get("success"))
+
+        # Verify new user can sign in immediately
+        login_res = self.client.post("/api/auth/login", json={
+            "username": new_user,
+            "password": "InitialPassword2026!"
+        })
+        self.assertEqual(login_res.status_code, 200)
+
+        # Clean up created test user
+        from database import db
+        if db.client:
+            db.client.table("users").delete().eq("username", new_user).execute()
+
     # -------------------------------------------------------------
     # 5. Asset & Favicon Routes Tests
     # -------------------------------------------------------------
