@@ -394,20 +394,22 @@ exports.handler = async (event, context) => {
   if (path === '/api/scrape/search' && method === 'POST') {
     const q = (body.query || '').trim();
     const limit = parseInt(body.limit || '40', 10);
+    const searchStartTime = Date.now();
 
-    // 1. Attempt live scrape directly from Flexnet Japan
+    // 1. Attempt live scrape directly from Flexnet Japan with full criteria payload
     try {
-      const liveResult = await scrapeSearchLive({ query: q, limit }, SUPABASE_URL, SUPABASE_KEY);
+      const liveResult = await scrapeSearchLive(body, SUPABASE_URL, SUPABASE_KEY);
       if (liveResult.success && liveResult.vehicles && liveResult.vehicles.length > 0) {
         return jsonResponse(200, {
           success: true,
           count: liveResult.vehicles.length,
-          total_found: liveResult.vehicles.length,
+          total_found: liveResult.total_found || liveResult.vehicles.length,
           vehicles: liveResult.vehicles,
           query: liveResult.query,
           translated_query: liveResult.translated_query,
           search_url: liveResult.search_url,
           saved_to_supabase: liveResult.saved_to_supabase || 0,
+          elapsed_seconds: liveResult.elapsed_seconds || 0,
           source: 'live_flexnet'
         });
       }
@@ -418,7 +420,20 @@ exports.handler = async (event, context) => {
     // 2. Fallback to Supabase database
     let supabaseQuery = `${SUPABASE_URL}/rest/v1/flexnet_vehicles?select=*&order=id.desc&limit=${limit}`;
     if (q) {
-      supabaseQuery += `&or=(title.ilike.*${encodeURIComponent(q)}*,tagline.ilike.*${encodeURIComponent(q)}*,model.ilike.*${encodeURIComponent(q)}*)`;
+      const qNoSpace = q.replace(/\s+/g, '');
+      const orClauses = [
+        `title.ilike.*${encodeURIComponent(q)}*`,
+        `tagline.ilike.*${encodeURIComponent(q)}*`,
+        `model.ilike.*${encodeURIComponent(q)}*`
+      ];
+      if (qNoSpace !== q) {
+        orClauses.push(
+          `title.ilike.*${encodeURIComponent(qNoSpace)}*`,
+          `tagline.ilike.*${encodeURIComponent(qNoSpace)}*`,
+          `model.ilike.*${encodeURIComponent(qNoSpace)}*`
+        );
+      }
+      supabaseQuery += `&or=(${orClauses.join(',')})`;
     }
 
     try {
@@ -426,11 +441,14 @@ exports.handler = async (event, context) => {
       let vehicles = await res.json();
       if (!Array.isArray(vehicles)) vehicles = [];
 
+      const elapsed = Number(((Date.now() - searchStartTime) / 1000).toFixed(1));
       return jsonResponse(200, {
         success: true,
         count: vehicles.length,
         total_found: vehicles.length,
         vehicles,
+        query: q,
+        elapsed_seconds: elapsed,
         source: 'supabase'
       });
     } catch (err) {

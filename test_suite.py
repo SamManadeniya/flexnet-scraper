@@ -115,6 +115,36 @@ class TestFlexnetSystem(unittest.TestCase):
         )
         self.assertTrue(is_match)
 
+    def test_model_guard_blocks_plain_hiace_in_coast_lines_search(self):
+        is_match = is_vehicle_model_match(
+            search_query="Coast Lines",
+            translated_kw="CoastLines",
+            car_model="ハイエース",
+            car_title="トヨタ ハイエースバン 2.0 スーパーGL ダークプライムⅡ ロングボディ",
+            car_tagline="【厳選仕入車】スーパーGLダークプライムⅡガソリン2WD！"
+        )
+        self.assertFalse(is_match)
+
+    def test_model_guard_accepts_genuine_coast_lines(self):
+        is_match = is_vehicle_model_match(
+            search_query="Coast Lines",
+            translated_kw="CoastLines",
+            car_model="ハイエース",
+            car_title="トヨタ ハイエース 2.7 GL ロング ミドルルーフ",
+            car_tagline="【Renoca CoastLines/ワゴンGL】大人気カラー角目フェイス♪"
+        )
+        self.assertTrue(is_match)
+
+    def test_model_guard_accepts_katakana_coast_lines(self):
+        is_match = is_vehicle_model_match(
+            search_query="Coast Lines",
+            translated_kw="CoastLines",
+            car_model="ハイエース",
+            car_title="トヨタ ハイエース 2.7 GL ロング ミドルルーフ 4WD",
+            car_tagline="【Renoca コーストライン】【角目4灯フェイスチェンジ】"
+        )
+        self.assertTrue(is_match)
+
     # -------------------------------------------------------------
     # 4. Password Reset & Security Hint Tests
     # -------------------------------------------------------------

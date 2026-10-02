@@ -125,7 +125,37 @@ const FLEXNET_MODEL_ROUTES = {
   'campervan': '/search/toyota/camping',
   'キャンピングカー': '/search/toyota/camping',
   'us toyota': '/search/us-toyota',
-  'usトヨタ': '/search/us-toyota'
+  'usトヨタ': '/search/us-toyota',
+
+  // Custom Renoca and Flexnet specialty lines
+  'coast lines wide': '/search/toyota/hiace/COASTLINESWide',
+  'coastlines wide': '/search/toyota/hiace/COASTLINESWide',
+  'coast lines narrow': '/search/toyota/hiace/COASTLINESNarrow',
+  'coastlines narrow': '/search/toyota/hiace/COASTLINESNarrow',
+  'coast lines': '/search?kw=CoastLines',
+  'coastlines': '/search?kw=CoastLines',
+  'renoca coast lines': '/search?kw=CoastLines',
+  'renoca coastlines': '/search?kw=CoastLines',
+  'コーストライン': '/search?kw=CoastLines',
+  'wood village': '/search?kw=WoodVillage',
+  'wood village camper': '/search?kw=WoodVillage',
+  'woodvillage': '/search?kw=WoodVillage',
+  'color bomb': '/search?kw=ColorBomb',
+  'colorbomb': '/search?kw=ColorBomb',
+  'euro box': '/search?kw=EuroBox',
+  'eurobox': '/search?kw=EuroBox',
+  'probox custom': '/search?kw=%E3%83%97%E3%83%AD%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9',
+  'probox': '/search?kw=%E3%83%97%E3%83%AD%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9',
+  'プロボックス': '/search?kw=%E3%83%97%E3%83%AD%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9',
+  'fj cruiser': '/search?kw=FJ%E3%82%AF%E3%83%AB%E3%83%BC%E3%82%B6%E3%83%BC',
+  'fj': '/search?kw=FJ%E3%82%AF%E3%83%AB%E3%83%BC%E3%82%B6%E3%83%BC',
+  'fj クルーザー': '/search?kw=FJ%E3%82%AF%E3%83%AB%E3%83%BC%E3%82%B6%E3%83%BC',
+  'fjクルーザー': '/search?kw=FJ%E3%82%AF%E3%83%AB%E3%83%BC%E3%82%B6%E3%83%BC',
+  'american classic': '/search?kw=American+Classic',
+  'americanclassic': '/search?kw=American+Classic',
+  'wonder': '/search?kw=Wonder',
+  'phoenix': '/search?kw=Phoenix',
+  'renoca': '/search?rnc=1'
 };
 
 function isVehicleModelMatch(searchQuery, translatedKw, carModel, carTitle, carTagline) {
@@ -139,6 +169,15 @@ function isVehicleModelMatch(searchQuery, translatedKw, carModel, carTitle, carT
   const combined = `${cm} ${ct} ${cg}`;
 
   const families = [
+    ['coast_lines', ['coast lines', 'coastlines', 'coast', 'コーストライン']],
+    ['american_classic', ['american classic', 'americanclassic', 'アメリカンクラシック']],
+    ['color_bomb', ['color bomb', 'colorbomb', 'カラーボム']],
+    ['wonder', ['wonder', 'ワンダー']],
+    ['phoenix', ['phoenix', 'フェニックス']],
+    ['euro_box', ['euro box', 'eurobox', 'ユーロボックス']],
+    ['wood_village', ['wood village', 'woodvillage', 'ウッドヴィレッジ', 'beluga', 'ベルーガ']],
+    ['mol', ['mol', 'モル']],
+    ['106', ['106']],
     ['prado', ['プラド', 'prado']],
     ['hilux_surf', ['ハイラックスサーフ', 'hilux surf', 'surf', 'サーフ']],
     ['hilux', ['ハイラックス', 'hilux']],
@@ -167,9 +206,14 @@ function isVehicleModelMatch(searchQuery, translatedKw, carModel, carTitle, carT
     }
   }
 
+  // If specific conversion line is targeted, prevent generic base platforms from dominating
+  if (targetFamilies.has('coast_lines') && targetFamilies.has('hiace')) targetFamilies.delete('hiace');
+  if (targetFamilies.has('wood_village') && targetFamilies.has('hiace')) targetFamilies.delete('hiace');
+  if (targetFamilies.has('american_classic') && targetFamilies.has('prado')) targetFamilies.delete('prado');
+
   const carFamilies = new Set();
   for (const [fam, tokens] of families) {
-    if (tokens.some(t => cm.includes(t) || ct.includes(t))) {
+    if (tokens.some(t => cm.includes(t) || ct.includes(t) || cg.includes(t))) {
       if (fam === 'hilux' && (cm.includes('サーフ') || ct.includes('サーフ') || ct.includes('surf'))) continue;
       if (fam === 'hilux_surf' && !(cm.includes('サーフ') || ct.includes('サーフ') || ct.includes('surf'))) continue;
       carFamilies.add(fam);
@@ -274,7 +318,25 @@ const AUTOMOTIVE_MAP = {
   'custom': 'カスタム',
   'diesel': 'ディーゼル',
   'gasoline': 'ガソリン',
-  'hybrid': 'ハイブリッド'
+  'hybrid': 'ハイブリッド',
+
+  // Custom Renoca & specialty model dictionary
+  'coast lines': 'CoastLines',
+  'coastlines': 'CoastLines',
+  'renoca coast lines': 'CoastLines',
+  'renoca coastlines': 'CoastLines',
+  'wood village': 'WoodVillage',
+  'wood village camper': 'WoodVillage',
+  'woodvillage': 'WoodVillage',
+  'color bomb': 'ColorBomb',
+  'colorbomb': 'ColorBomb',
+  'euro box': 'EuroBox',
+  'eurobox': 'EuroBox',
+  'probox custom': 'プロボックス',
+  'american classic': 'American Classic',
+  'americanclassic': 'American Classic',
+  'wonder': 'Wonder',
+  'phoenix': 'Phoenix'
 };
 
 const RENOCA_AND_PROPRIETARY_TERMS = new Set([
@@ -304,7 +366,14 @@ const SHORTHAND_EXPANSIONS = [
   [/\bprado\s*150\b/gi, '150 prado'],
   [/\bprado\s*120\b/gi, '120 prado'],
   [/\bprado\s*90\b/gi, '90 prado'],
-  [/\bprado\s*70\b/gi, '70 prado']
+  [/\bprado\s*70\b/gi, '70 prado'],
+  [/\bcoast\s*lines?\b/gi, 'CoastLines'],
+  [/\bcolor\s*bombs?\b/gi, 'ColorBomb'],
+  [/\beuro\s*box\b/gi, 'EuroBox'],
+  [/\bwood\s*village\b/gi, 'WoodVillage'],
+  [/\bdelfino\s*line\b/gi, 'DelfinoLine'],
+  [/\bre\s*classic\b/gi, 'ReClassic'],
+  [/\bprobox\s*custom\b/gi, 'probox']
 ];
 
 async function translateQueryToJapanese(query) {
@@ -321,9 +390,17 @@ async function translateQueryToJapanese(query) {
     cleaned = cleaned.replace(pat, repl);
   }
 
-  if (AUTOMOTIVE_MAP[cleaned]) {
-    return AUTOMOTIVE_MAP[cleaned];
+  if (AUTOMOTIVE_MAP[cleaned.toLowerCase()]) {
+    return AUTOMOTIVE_MAP[cleaned.toLowerCase()];
   }
+
+  // Handle specific compound terms
+  const lowClean = cleaned.toLowerCase();
+  if (lowClean.includes('coastline') || lowClean.includes('coast line')) return 'CoastLines';
+  if (lowClean.includes('woodvillage') || lowClean.includes('wood village')) return 'WoodVillage';
+  if (lowClean.includes('colorbomb') || lowClean.includes('color bomb')) return 'ColorBomb';
+  if (lowClean.includes('eurobox') || lowClean.includes('euro box')) return 'EuroBox';
+  if (lowClean.includes('probox')) return 'プロボックス';
 
   // Preserve proprietary lines
   if (Array.from(RENOCA_AND_PROPRIETARY_TERMS).some(t => cleaned.includes(t))) {
@@ -463,8 +540,13 @@ const TITLE_TERMS_JA_TO_EN = {
   'ウッドヴィレッジ': 'Wood Village',
   'デルフィーノライン': 'DelfinoLine',
   'スーパーGL': 'Super GL',
+  'プライムセレクション': 'Prime Selection',
   'ダークプライムⅡ': 'Dark Prime II',
+  'ダークプライムII': 'Dark Prime II',
+  'ダークプライム2': 'Dark Prime II',
   'ダークプライム': 'Dark Prime',
+  'グランドキャビン': 'Grand Cabin',
+  'コミューター': 'Commuter',
   'ミドルルーフ': 'Middle Roof',
   'ハイルーフ': 'High Roof',
   'ロングボディ': 'Long Body',
@@ -646,7 +728,41 @@ function translateVehicleToEnglish(v) {
     for (const [ja, en] of Object.entries(TITLE_TERMS_JA_TO_EN)) {
       title = title.split(ja).join(` ${en} `);
     }
-    out.title = title.replace(/\s+/g, ' ').trim();
+    title = title.replace(/\s+/g, ' ').trim();
+
+    // Enrich title with Renoca conversion model name if confirmed in tagline or badge tags
+    const lowerTagline = String(out.tagline || '').toLowerCase();
+    const lowerTitle = title.toLowerCase();
+    const badgeStr = Array.isArray(out.badge_tags) ? out.badge_tags.join(' ').toLowerCase() : '';
+
+    const RENOCA_LINE_ENRICHERS = [
+      { pattern: /coast\s*lines|コーストライン/i, name: 'Renoca Coast Lines' },
+      { pattern: /color\s*bomb|カラーボム/i, name: 'Renoca Color Bomb' },
+      { pattern: /euro\s*box|ユーロボックス/i, name: 'Renoca Euro Box' },
+      { pattern: /wood\s*village|ウッドヴィレッジ/i, name: 'Renoca Wood Village' },
+      { pattern: /american\s*classic|アメリカンクラシック/i, name: 'Renoca American Classic' },
+      { pattern: /wonder|ワンダー/i, name: 'Renoca Wonder' },
+      { pattern: /phoenix|フェニックス/i, name: 'Renoca Phoenix' },
+      { pattern: /windansea/i, name: 'Renoca Windansea' },
+      { pattern: /106/i, name: 'Renoca 106' },
+      { pattern: /mol|モル/i, name: 'Renoca MOL' }
+    ];
+
+    for (const { pattern, name } of RENOCA_LINE_ENRICHERS) {
+      if ((pattern.test(lowerTagline) || pattern.test(badgeStr)) && !pattern.test(lowerTitle)) {
+        const baseMatch = title.match(/^(Toyota|Nissan|Mitsubishi|Suzuki|Subaru|Honda)\s+(Land\s+Cruiser\s+Prado|Land\s+Cruiser\s+\d+|Land\s+Cruiser|Hiace\s+Van|Hiace\s+Wagon|Hiace|Probox\s+Van|Probox|Succeed\s+Van|Succeed|Hilux\s+Surf|Hilux|TownAce|Jimny\s+Sierra|Jimny|Delica\s+D:?5|Delica)/i);
+        if (baseMatch) {
+          const prefix = baseMatch[0];
+          const remainder = title.slice(prefix.length).trim();
+          title = `${prefix} ${name} ${remainder}`.replace(/\s+/g, ' ').trim();
+        } else {
+          title = `${name} ${title}`.trim();
+        }
+        break;
+      }
+    }
+
+    out.title = title;
   }
 
   // Model Year
@@ -1088,6 +1204,7 @@ async function upsertVehiclesToSupabase(vehicles, supabaseUrl, supabaseKey) {
 // ==============================================================================
 
 async function scrapeSearchLive(options = {}, supabaseUrl, supabaseKey) {
+  const startTime = Date.now();
   const rawQuery = (options.query || '').trim();
   const limit = parseInt(options.limit || '40', 10);
   const lowQuery = rawQuery.toLowerCase();
@@ -1095,16 +1212,60 @@ async function scrapeSearchLive(options = {}, supabaseUrl, supabaseKey) {
 
   // Dedicated direct category routes on Flexnet Japan
   let targetPath = '/search';
-  if (FLEXNET_MODEL_ROUTES[lowQuery]) {
-    targetPath = FLEXNET_MODEL_ROUTES[lowQuery];
-  } else if (FLEXNET_MODEL_ROUTES[jpQuery]) {
-    targetPath = FLEXNET_MODEL_ROUTES[jpQuery];
+  let initialParams = new URLSearchParams();
+
+  const matchedRoute = FLEXNET_MODEL_ROUTES[lowQuery] || FLEXNET_MODEL_ROUTES[jpQuery] || (rawQuery ? FLEXNET_MODEL_ROUTES[rawQuery.toLowerCase()] : null);
+  if (matchedRoute) {
+    if (matchedRoute.includes('?')) {
+      const [p, q] = matchedRoute.split('?');
+      targetPath = p;
+      initialParams = new URLSearchParams(q);
+    } else {
+      targetPath = matchedRoute;
+    }
   }
 
-  let searchUrl = `https://www.flexnet.co.jp${targetPath}`;
-  if (targetPath === '/search' && jpQuery) {
-    searchUrl += `?keyword=${encodeURIComponent(jpQuery)}`;
+  // Construct query parameters matching Flexnet's native query engine
+  const queryParams = new URLSearchParams(initialParams);
+  queryParams.set('num', String(Math.max(limit, 40)));
+
+  // If keyword not already specified by dedicated route, pass via kw=
+  if (!queryParams.has('kw') && !queryParams.has('rnc')) {
+    if (targetPath === '/search' && jpQuery) {
+      queryParams.set('kw', jpQuery);
+    }
   }
+
+  // Native Flexnet search filters
+  if (options.min_year) queryParams.set('lwa', String(options.min_year));
+  if (options.max_year) queryParams.set('upa', String(options.max_year));
+  if (options.min_price) queryParams.set('lwp', String(options.min_price));
+  if (options.max_price) queryParams.set('upp', String(options.max_price));
+  if (options.min_km) queryParams.set('lwm', String(options.min_km));
+  if (options.max_km) queryParams.set('upm', String(options.max_km));
+
+  if (options.drive_system) {
+    const d = String(options.drive_system).toUpperCase();
+    if (d === '4WD' || d === '2') queryParams.set('drv', '2');
+    else if (d === '2WD' || d === '1') queryParams.set('drv', '1');
+  }
+
+  if (options.fuel_type) {
+    const f = String(options.fuel_type).toLowerCase();
+    if (f === '1' || f.includes('gas') || f.includes('ガソリン')) queryParams.set('ful', '1');
+    else if (f === '2' || f.includes('diesel') || f.includes('ディーゼル')) queryParams.set('ful', '2');
+    else if (f === '3' || f.includes('hybrid') || f.includes('ハイブリッド')) queryParams.set('ful', '3');
+    else if (f === '4' || f.includes('ev') || f.includes('電気')) queryParams.set('ful', '4');
+  }
+
+  if (options.no_repair_history) queryParams.set('rep', '1');
+  if (options.inspection_included) queryParams.set('ins', '1');
+  if (options.is_new_car) queryParams.set('nwc', '1');
+  if (options.is_used_car) queryParams.set('usd', '1');
+  if (options.is_renoca) queryParams.set('rnc', '1');
+  if (options.is_campervan) queryParams.set('cpc', '1');
+
+  const searchUrl = `https://www.flexnet.co.jp${targetPath}?${queryParams.toString()}`;
 
   try {
     const res = await fetch(searchUrl, {
@@ -1114,11 +1275,55 @@ async function scrapeSearchLive(options = {}, supabaseUrl, supabaseKey) {
     const html = await res.text();
     let vehicles = parseSearchPage(html);
 
-    // Apply isVehicleModelMatch guard for 100% precision
+    // Apply strict isVehicleModelMatch guard for 100% precision
     if (rawQuery) {
-      const filtered = vehicles.filter(v => isVehicleModelMatch(rawQuery, jpQuery, v.model, v.title, v.tagline));
-      if (filtered.length > 0) {
-        vehicles = filtered;
+      vehicles = vehicles.filter(v => isVehicleModelMatch(rawQuery, jpQuery, v.model, v.title, v.tagline));
+    }
+
+    // In-memory filter verification for absolute accuracy
+    if (options.min_year || options.max_year) {
+      vehicles = vehicles.filter(v => {
+        const yMatch = String(v.model_year || '').match(/(\d{4})/);
+        if (!yMatch) return true;
+        const y = parseInt(yMatch[1], 10);
+        if (options.min_year && y < options.min_year) return false;
+        if (options.max_year && y > options.max_year) return false;
+        return true;
+      });
+    }
+
+    if (options.min_price || options.max_price) {
+      vehicles = vehicles.filter(v => {
+        const p = v.total_price || v.vehicle_price;
+        if (!p) return true;
+        if (options.min_price && p < options.min_price * 10000) return false;
+        if (options.max_price && p > options.max_price * 10000) return false;
+        return true;
+      });
+    }
+
+    if (options.min_km || options.max_km) {
+      vehicles = vehicles.filter(v => {
+        const km = v.mileage_km;
+        if (km == null) return true;
+        if (options.min_km && km < options.min_km) return false;
+        if (options.max_km && km > options.max_km) return false;
+        return true;
+      });
+    }
+
+    if (options.drive_system) {
+      const d = String(options.drive_system).toUpperCase();
+      if (d === '4WD' || d === '2') {
+        vehicles = vehicles.filter(v => {
+          const txt = `${v.title || ''} ${v.drive_system || ''} ${v.tagline || ''}`.toUpperCase();
+          return txt.includes('4WD') || txt.includes('4駆') || txt.includes('FOUR WHEEL');
+        });
+      } else if (d === '2WD' || d === '1') {
+        vehicles = vehicles.filter(v => {
+          const txt = `${v.title || ''} ${v.drive_system || ''} ${v.tagline || ''}`.toUpperCase();
+          return !txt.includes('4WD') && !txt.includes('4駆');
+        });
       }
     }
 
@@ -1131,6 +1336,8 @@ async function scrapeSearchLive(options = {}, supabaseUrl, supabaseKey) {
       saved = await upsertVehiclesToSupabase(vehicles, supabaseUrl, supabaseKey);
     }
 
+    const elapsedSeconds = Number(((Date.now() - startTime) / 1000).toFixed(1));
+
     return {
       success: true,
       count: vehicles.length,
@@ -1140,13 +1347,15 @@ async function scrapeSearchLive(options = {}, supabaseUrl, supabaseKey) {
       translated_query: jpQuery,
       search_url: searchUrl,
       saved_to_supabase: saved,
+      elapsed_seconds: elapsedSeconds,
       source: 'live_flexnet'
     };
   } catch (err) {
     console.error('Live search error:', err);
     return {
       success: false,
-      error: err.message
+      error: err.message,
+      elapsed_seconds: Number(((Date.now() - startTime) / 1000).toFixed(1))
     };
   }
 }

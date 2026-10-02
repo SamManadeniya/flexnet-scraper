@@ -664,6 +664,39 @@
       gap: 4px;
     }
 
+    .renoca-badge {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #000;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+      z-index: 2;
+    }
+
+    .car-tagline {
+      font-size: 11px;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 2px solid var(--primary);
+      padding: 4px 8px;
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 10px;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
     .car-info {
       padding: 16px;
       display: flex;
@@ -2371,16 +2404,21 @@
         const photosCount = (car.image_urls || []).length || 1;
         const coverImg = car.thumbnail_url || (car.image_urls && car.image_urls[0]) || '';
         const priceFmt = car.total_price ? `¥ ${Number(car.total_price).toLocaleString()} JPY` : 'Ask for Price';
+        const isRenoca = (car.badge_tags && car.badge_tags.includes('Renoca')) ||
+          (car.title && car.title.toLowerCase().includes('renoca')) ||
+          (car.tagline && car.tagline.toLowerCase().includes('renoca'));
 
         return `
-          <div class="car-card">
+          <div class="car-card" data-idx="${idx}">
             <div class="car-media">
-              <img src="${coverImg}" alt="${car.title}" onerror="this.src='https://www.flexnet.co.jp/common/v2/images/common/nophoto_640x480.jpg'">
+              <img src="${coverImg}" alt="${escapeHtml(car.title)}" onerror="this.src='https://www.flexnet.co.jp/common/v2/images/common/nophoto_640x480.jpg'">
+              ${isRenoca ? '<div class="renoca-badge"><i class="fa-solid fa-crown"></i> RENOCA</div>' : ''}
               <div class="photo-badge"><i class="fa-solid fa-camera"></i> ${photosCount} Photos</div>
               <div class="sync-badge"><i class="fa-solid fa-check-circle"></i> In Supabase</div>
             </div>
             <div class="car-info">
-              <div class="car-title" title="${car.title}">${car.title}</div>
+              <div class="car-title" title="${escapeHtml(car.title)}">${escapeHtml(car.title)}</div>
+              ${car.tagline ? `<div class="car-tagline" title="${escapeHtml(car.tagline)}">${escapeHtml(car.tagline)}</div>` : ''}
               <div class="car-price-row">
                 <div>
                   <div class="car-price-total">${priceFmt}</div>
@@ -2415,7 +2453,14 @@
       if (!car) return;
 
       document.getElementById('modalTitle').innerText = car.title;
-      document.getElementById('modalSub').innerText = `${car.store_name || ''} • ${car.store_tel || ''}`;
+      if (car.tagline) {
+        document.getElementById('modalSub').innerHTML = `
+          <div>${escapeHtml(car.store_name || '')} • ${escapeHtml(car.store_tel || '')}</div>
+          <div style="margin-top: 4px; font-size: 12px; color: #38bdf8; font-weight: 500;">${escapeHtml(car.tagline)}</div>
+        `;
+      } else {
+        document.getElementById('modalSub').innerText = `${car.store_name || ''} • ${car.store_tel || ''}`;
+      }
       document.getElementById('modalPriceRow').innerText = car.total_price ? `Total Payment: ¥ ${Number(car.total_price).toLocaleString()} JPY` : 'Price On Request';
 
       const specs = [
@@ -2463,10 +2508,51 @@
         : '<span style="color: var(--text-muted); font-size: 12px;">Standard equipment</span>';
 
       const images = car.image_urls || [];
-      document.getElementById('modalGallery').innerHTML = images.length ? images.slice(0, 30).map((u, i) => `
+      let galleryHtml = images.length ? images.slice(0, 40).map((u, i) => `
         <a href="${u}" target="_blank" rel="noopener"><img src="${u}" alt="Photo ${i+1}" onerror="this.style.display='none'"></a>
       `).join('') : '<div style="color: var(--text-muted); font-size: 13px;">No gallery photos available.</div>';
 
+      if ((!car.image_urls || car.image_urls.length <= 1) && car.detail_url) {
+        galleryHtml += `
+          <div id="modalLoadingDetails" style="grid-column: 1 / -1; margin-top: 8px; padding: 10px 14px; background: rgba(6, 182, 212, 0.08); border: 1px dashed var(--border-glow); border-radius: 8px; font-size: 12px; color: var(--cyan); display: flex; align-items: center; gap: 8px;">
+            <i class="fa-solid fa-spinner fa-spin"></i> Loading full 40+ HD gallery photos & equipment specs from Flexnet Japan...
+          </div>
+        `;
+
+        fetch(`${API_BASE}/api/scrape/single`, {
+          method: 'POST',
+          headers: getAuthHeaders({ 'Content-Type': 'application/json' }),
+          body: JSON.stringify({ url: car.detail_url, kanri_code: car.kanri_code })
+        })
+        .then(r => r.json())
+        .then(d => {
+          if (d.success && d.vehicle) {
+            Object.assign(car, d.vehicle);
+            const cardEl = document.querySelector(`.car-card[data-idx="${idx}"] .photo-badge`);
+            if (cardEl && car.image_urls?.length) {
+              cardEl.innerHTML = `<i class="fa-solid fa-camera"></i> ${car.image_urls.length} Photos`;
+            }
+            // If modal is still open for this vehicle, re-render
+            const curModalTitle = document.getElementById('modalTitle').innerText;
+            if (curModalTitle === car.title || curModalTitle === d.vehicle.title) {
+              const updatedImages = car.image_urls || [];
+              document.getElementById('modalGallery').innerHTML = updatedImages.slice(0, 40).map((u, i) => `
+                <a href="${u}" target="_blank" rel="noopener"><img src="${u}" alt="Photo ${i+1}" onerror="this.style.display='none'"></a>
+              `).join('');
+
+              const updatedEq = car.equipment || [];
+              if (updatedEq.length) {
+                document.getElementById('modalEquipment').innerHTML = updatedEq.map(e => `
+                  <span style="background: rgba(6, 182, 212, 0.15); border: 1px solid var(--border-glow); padding: 4px 10px; border-radius: 20px; font-size: 11px; color: #fff;">${e}</span>
+                `).join('');
+              }
+            }
+          }
+        })
+        .catch(err => console.warn('Could not load deep details:', err));
+      }
+
+      document.getElementById('modalGallery').innerHTML = galleryHtml;
       document.getElementById('carModal').style.display = 'flex';
     }
 

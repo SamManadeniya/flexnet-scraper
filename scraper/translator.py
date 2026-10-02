@@ -472,8 +472,13 @@ TITLE_TERMS_JA_TO_EN = {
 
     # Trims & Body specs
     "スーパーGL": "Super GL",
+    "プライムセレクション": "Prime Selection",
     "ダークプライムⅡ": "Dark Prime II",
+    "ダークプライムII": "Dark Prime II",
+    "ダークプライム2": "Dark Prime II",
     "ダークプライム": "Dark Prime",
+    "グランドキャビン": "Grand Cabin",
+    "コミューター": "Commuter",
     "ミドルルーフ": "Middle Roof",
     "ハイルーフ": "High Roof",
     "ロングボディ": "Long Body",
@@ -679,6 +684,41 @@ def translate_vehicle_to_english(v: Dict[str, Any]) -> Dict[str, Any]:
             trans_title = trans_title.replace(ja, f" {en} ")
         # Clean extra spaces
         trans_title = re.sub(r"\s+", " ", trans_title).strip()
+
+        # Enrich title with Renoca conversion model if confirmed in tagline or badges
+        tagline_lower = str(out.get("tagline") or "").lower()
+        badges = out.get("badge_tags") or []
+        badge_str = " ".join(str(b) for b in badges).lower() if isinstance(badges, list) else str(badges).lower()
+        cur_title_lower = trans_title.lower()
+
+        renoca_conversions = [
+            (re.compile(r"coast\s*lines|コーストライン", re.I), "Renoca Coast Lines"),
+            (re.compile(r"color\s*bomb|カラーボム", re.I), "Renoca Color Bomb"),
+            (re.compile(r"euro\s*box|ユーロボックス", re.I), "Renoca Euro Box"),
+            (re.compile(r"wood\s*village|ウッドヴィレッジ", re.I), "Renoca Wood Village"),
+            (re.compile(r"american\s*classic|アメリカンクラシック", re.I), "Renoca American Classic"),
+            (re.compile(r"wonder|ワンダー", re.I), "Renoca Wonder"),
+            (re.compile(r"phoenix|フェニックス", re.I), "Renoca Phoenix"),
+            (re.compile(r"windansea", re.I), "Renoca Windansea"),
+            (re.compile(r"106", re.I), "Renoca 106"),
+            (re.compile(r"mol|モル", re.I), "Renoca MOL"),
+        ]
+
+        for pattern, model_name in renoca_conversions:
+            if (pattern.search(tagline_lower) or pattern.search(badge_str)) and not pattern.search(cur_title_lower):
+                base_match = re.match(
+                    r"^(Toyota|Nissan|Mitsubishi|Suzuki|Subaru|Honda)\s+(Land\s+Cruiser\s+Prado|Land\s+Cruiser\s+\d+|Land\s+Cruiser|Hiace\s+Van|Hiace\s+Wagon|Hiace|Probox\s+Van|Probox|Succeed\s+Van|Succeed|Hilux\s+Surf|Hilux|TownAce|Jimny\s+Sierra|Jimny|Delica\s+D:?5|Delica)",
+                    trans_title,
+                    re.I
+                )
+                if base_match:
+                    prefix = base_match.group(0)
+                    remainder = trans_title[len(prefix):].strip()
+                    trans_title = re.sub(r"\s+", " ", f"{prefix} {model_name} {remainder}").strip()
+                else:
+                    trans_title = f"{model_name} {trans_title}".strip()
+                break
+
         out["title"] = trans_title
 
     # 4. Model Year (e.g. 2020年(R02年) -> 2020)

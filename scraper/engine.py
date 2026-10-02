@@ -145,6 +145,36 @@ FLEXNET_MODEL_ROUTES: Dict[str, str] = {
     "us toyota": "/search/us-toyota",
     "usトヨタ": "/search/us-toyota",
     "us トヨタ": "/search/us-toyota",
+
+    # Custom Renoca and Flexnet specialty lines
+    "coast lines wide": "/search/toyota/hiace/COASTLINESWide",
+    "coastlines wide": "/search/toyota/hiace/COASTLINESWide",
+    "coast lines narrow": "/search/toyota/hiace/COASTLINESNarrow",
+    "coastlines narrow": "/search/toyota/hiace/COASTLINESNarrow",
+    "coast lines": "/search?kw=CoastLines",
+    "coastlines": "/search?kw=CoastLines",
+    "renoca coast lines": "/search?kw=CoastLines",
+    "renoca coastlines": "/search?kw=CoastLines",
+    "コーストライン": "/search?kw=CoastLines",
+    "wood village": "/search?kw=WoodVillage",
+    "wood village camper": "/search?kw=WoodVillage",
+    "woodvillage": "/search?kw=WoodVillage",
+    "color bomb": "/search?kw=ColorBomb",
+    "colorbomb": "/search?kw=ColorBomb",
+    "euro box": "/search?kw=EuroBox",
+    "eurobox": "/search?kw=EuroBox",
+    "probox custom": "/search?kw=%E3%83%97%E3%83%AD%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9",
+    "probox": "/search?kw=%E3%83%97%E3%83%AD%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9",
+    "プロボックス": "/search?kw=%E3%83%97%E3%83%AD%E3%83%9C%E3%83%83%E3%82%AF%E3%82%B9",
+    "fj cruiser": "/search?kw=FJ%E3%82%AF%E3%83%AB%E3%83%BC%E3%82%B6%E3%83%BC",
+    "fj": "/search?kw=FJ%E3%82%AF%E3%83%AB%E3%83%BC%E3%82%B6%E3%83%BC",
+    "fj クルーザー": "/search?kw=FJ%E3%82%AF%E3%83%AB%E3%83%BC%E3%82%B6%E3%83%BC",
+    "fjクルーザー": "/search?kw=FJ%E3%82%AF%E3%83%AB%E3%83%BC%E3%82%B6%E3%83%BC",
+    "american classic": "/search?kw=American+Classic",
+    "americanclassic": "/search?kw=American+Classic",
+    "wonder": "/search?kw=Wonder",
+    "phoenix": "/search?kw=Phoenix",
+    "renoca": "/search?rnc=1",
 }
 
 def is_vehicle_model_match(
@@ -173,6 +203,15 @@ def is_vehicle_model_match(
     # Conflicting major model families:
     # (family_key, [japanese_tokens, english_tokens])
     families = [
+        ("coast_lines", ["coast lines", "coastlines", "coast", "コーストライン"]),
+        ("american_classic", ["american classic", "americanclassic", "アメリカンクラシック"]),
+        ("color_bomb", ["color bomb", "colorbomb", "カラーボム"]),
+        ("wonder", ["wonder", "ワンダー"]),
+        ("phoenix", ["phoenix", "フェニックス"]),
+        ("euro_box", ["euro box", "eurobox", "ユーロボックス"]),
+        ("wood_village", ["wood village", "woodvillage", "ウッドヴィレッジ", "beluga", "ベルーガ"]),
+        ("mol", ["mol", "モル"]),
+        ("106", ["106"]),
         ("prado", ["プラド", "prado"]),
         ("hilux_surf", ["ハイラックスサーフ", "hilux surf", "surf", "サーフ"]),
         ("hilux", ["ハイラックス", "hilux"]),
@@ -202,10 +241,18 @@ def is_vehicle_model_match(
                 continue
             target_families.add(fam)
 
+    # If specific conversion line is targeted, prevent generic base platforms from dominating
+    if "coast_lines" in target_families and "hiace" in target_families:
+        target_families.discard("hiace")
+    if "wood_village" in target_families and "hiace" in target_families:
+        target_families.discard("hiace")
+    if "american_classic" in target_families and "prado" in target_families:
+        target_families.discard("prado")
+
     # 2. Identify which family the car belongs to
     car_families = set()
     for fam, tokens in families:
-        if any(t in cm or t in ct for t in tokens):
+        if any(t in cm or t in ct or t in cg for t in tokens):
             if fam == "hilux" and ("サーフ" in cm or "サーフ" in ct or "surf" in ct):
                 continue
             if fam == "hilux_surf" and not ("サーフ" in cm or "サーフ" in ct or "surf" in ct):
@@ -218,7 +265,7 @@ def is_vehicle_model_match(
             return False  # Mismatch! E.g. Query targeted Prado, but Car is Hilux
         return True
 
-    # For custom lines (Wonder, Coast Lines, Color Bomb, etc.) or generic keywords
+    # For custom lines or generic keywords
     words = [w for w in sq.split() if len(w) > 2]
     if words and any(w in combined_car_text for w in words):
         return True
@@ -572,13 +619,11 @@ class ScraperEngine:
 
             # Dynamic relevance filter: eliminates cross-promotion artifacts (e.g. Hilux when searching Prado)
             if query and query.strip():
-                filtered_previews = [
+                previews = [
                     p for p in previews
                     if is_vehicle_model_match(query, translated_kw, p.get("model"), p.get("title"), p.get("tagline"))
                 ]
-                if filtered_previews:
-                    previews = filtered_previews
-                    total_items = max(total_items, len(previews))
+                total_items = len(previews)
 
             cars_to_scrape = previews[:limit]
 
