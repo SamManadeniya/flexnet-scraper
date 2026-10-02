@@ -10,7 +10,7 @@ from auth import (
     decode_access_token,
 )
 from scraper.engine import is_vehicle_model_match
-from netlify.functions.api import handler as netlify_handler
+from netlify.functions.server import handler as netlify_handler
 
 class TestFlexnetSystem(unittest.TestCase):
 
