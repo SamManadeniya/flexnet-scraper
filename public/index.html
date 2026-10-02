@@ -1947,7 +1947,17 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
         });
-        const data = await res.json();
+        
+        let data = {};
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          if (!res.ok) {
+            showGkAlert(`API offline (${res.status}): Netlify build may still be deploying. Check Netlify Deploys.`);
+            return;
+          }
+        }
 
         if (res.ok && data.token) {
           localStorage.setItem(AUTH_TOKEN_KEY, data.token);
@@ -1959,7 +1969,7 @@
           showGkAlert(data.detail || data.message || 'Authentication failed. Please verify credentials.');
         }
       } catch (err) {
-        showGkAlert(`Network connection error: ${err.message}`);
+        showGkAlert(`Connection error: ${err.message}`);
       } finally {
         submitBtn.disabled = false;
         document.getElementById('gkSubmitText').innerText = originalText;
@@ -1993,7 +2003,17 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, recovery_hint, new_password })
         });
-        const data = await res.json();
+        
+        let data = {};
+        const contentType = res.headers.get('content-type') || '';
+        if (contentType.includes('application/json')) {
+          data = await res.json();
+        } else {
+          if (!res.ok) {
+            showGkAlert(`API offline (${res.status}): Netlify build may still be deploying. Check Netlify Deploys.`);
+            return;
+          }
+        }
 
         if (res.ok && data.success) {
           showGkAlert(`Success: Password for '${username}' was reset! Switching to login...`, 'success');
