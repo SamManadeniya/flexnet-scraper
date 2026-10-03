@@ -59,9 +59,11 @@
     }
 
     .container {
+      width: 100%;
       max-width: 1320px;
       margin: 0 auto;
       padding: 24px 20px 80px;
+      box-sizing: border-box;
     }
 
     /* Header */
@@ -149,8 +151,11 @@
     /* Main Grid */
     .app-layout {
       display: grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 420px minmax(0, 1fr);
       gap: 28px;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
     }
 
     /* Panel Card */
@@ -1300,14 +1305,20 @@
 
     /* Global viewport & overflow containment */
     html {
+      overflow-x: hidden;
+      max-width: 100%;
+      width: 100%;
       -webkit-text-size-adjust: 100%;
       scroll-behavior: smooth;
     }
 
     body {
       overflow-x: hidden;
-      max-width: 100vw;
+      max-width: 100%;
       width: 100%;
+      position: relative;
+      margin: 0;
+      padding: 0;
       -webkit-tap-highlight-color: transparent;
     }
 
@@ -1321,59 +1332,77 @@
     }
 
     /* --------------------------------------------------------- */
-    /* Large Tablets & Medium Displays (<= 1024px)               */
+    /* Tablets, Phablets & Mobile Devices (<= 1024px)            */
+    /* Single-column full-width layout to guarantee zero clipping */
     /* --------------------------------------------------------- */
     @media (max-width: 1024px) {
       .container {
-        padding: 20px 16px 70px;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 auto !important;
+        padding: 16px 14px 60px !important;
+        box-sizing: border-box !important;
       }
-      .app-layout {
-        grid-template-columns: 380px 1fr;
-        gap: 20px;
-      }
-      .glass-panel {
-        padding: 20px;
-      }
-      .cars-grid {
-        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-        gap: 16px;
-      }
-    }
 
-    /* --------------------------------------------------------- */
-    /* Tablets, Phablets & Mobile Landscape (<= 900px)           */
-    /* --------------------------------------------------------- */
-    @media (max-width: 900px) {
       .app-layout {
-        grid-template-columns: 1fr;
-        gap: 22px;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        gap: 18px !important;
+      }
+
+      .glass-panel {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+        padding: 18px 14px !important;
       }
 
       header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 14px;
-        padding: 16px 18px;
-        margin-bottom: 22px;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        padding: 16px 14px !important;
+        margin-bottom: 18px !important;
       }
 
       .logo-group {
-        justify-content: flex-start;
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        gap: 12px !important;
       }
 
       .system-status {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        justify-content: flex-start;
-        gap: 8px;
-        width: 100%;
-        padding-top: 12px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 6px !important;
+        padding-top: 10px !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
       }
 
+      .status-badge,
       .auth-user-pill {
-        margin-left: auto;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        justify-content: center !important;
+        text-align: center !important;
+        margin: 0 !important;
+      }
+
+      .cars-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+        gap: 16px !important;
+        width: 100% !important;
       }
     }
 
@@ -1382,245 +1411,296 @@
     /* --------------------------------------------------------- */
     @media (max-width: 640px) {
       body {
-        background-attachment: scroll; /* Fix iOS fixed background lag */
+        background-attachment: scroll !important; /* Fix iOS fixed background lag */
       }
 
       .container {
-        padding: 12px 12px max(50px, env(safe-area-inset-bottom, 20px));
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 10px 10px max(40px, env(safe-area-inset-bottom, 16px)) !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
       }
 
       /* Mobile Header */
       header {
-        padding: 14px 14px;
-        border-radius: 12px;
-        margin-bottom: 16px;
-        gap: 12px;
+        padding: 12px 12px !important;
+        border-radius: 12px !important;
+        margin-bottom: 14px !important;
+        gap: 10px !important;
       }
 
       .logo-group {
-        gap: 10px;
+        gap: 10px !important;
       }
 
       .logo-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 8px !important;
+        flex-shrink: 0 !important;
       }
 
       .brand-svg-logo {
-        width: 34px;
-        height: 34px;
+        width: 32px !important;
+        height: 32px !important;
       }
 
       .brand-title {
-        font-size: 16px;
-        line-height: 1.3;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 4px 6px;
+        font-size: 16px !important;
+        line-height: 1.3 !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 4px 6px !important;
       }
 
       .jdm-kanji-badge {
-        font-size: 9px;
-        padding: 2px 6px;
-        margin-left: 0;
+        font-size: 9px !important;
+        padding: 2px 6px !important;
+        margin-left: 0 !important;
       }
 
       .brand-subtitle {
-        font-size: 11px;
-        line-height: 1.3;
+        font-size: 11px !important;
+        line-height: 1.3 !important;
       }
 
       .system-status {
-        padding-top: 10px;
-        gap: 6px;
+        padding-top: 10px !important;
+        gap: 6px !important;
       }
 
       .status-badge {
-        padding: 4px 8px;
-        font-size: 11px;
-        gap: 6px;
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        gap: 6px !important;
+        border-radius: 12px !important;
       }
 
       .status-dot {
-        width: 6px;
-        height: 6px;
+        width: 6px !important;
+        height: 6px !important;
       }
 
       .auth-user-pill {
-        padding: 4px 8px;
-        font-size: 11px;
-        gap: 6px;
-        margin-left: 0;
+        padding: 6px 10px !important;
+        font-size: 11px !important;
+        gap: 6px !important;
+        border-radius: 12px !important;
       }
 
       .auth-role-tag {
-        font-size: 9px;
-        padding: 2px 5px;
+        font-size: 9px !important;
+        padding: 2px 5px !important;
       }
 
       .btn-auth-logout {
-        padding: 6px 4px;
-        min-width: 24px;
-        min-height: 24px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+        padding: 6px 6px !important;
+        min-width: 28px !important;
+        min-height: 28px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
 
       /* Panels */
       .glass-panel {
-        padding: 16px 14px;
-        border-radius: 14px;
+        padding: 14px 12px !important;
+        border-radius: 14px !important;
       }
 
       .panel-title {
-        font-size: 16px;
-        gap: 8px;
+        font-size: 16px !important;
+        gap: 8px !important;
       }
 
       .panel-subtitle {
-        font-size: 12px;
-        margin-bottom: 16px;
-        line-height: 1.4;
+        font-size: 12px !important;
+        margin-bottom: 14px !important;
+        line-height: 1.4 !important;
       }
 
       .tab-bar {
-        margin-bottom: 16px;
-        padding: 3px;
+        margin-bottom: 14px !important;
+        padding: 3px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .tab-btn {
-        padding: 9px 8px;
-        font-size: 12.5px;
-        min-height: 40px;
+        padding: 9px 8px !important;
+        font-size: 12.5px !important;
+        min-height: 40px !important;
+        flex: 1 !important;
+        min-width: 0 !important;
       }
 
       /* Touch-friendly inputs & 16px font to prevent iOS Safari auto-zoom */
+      .input-wrapper {
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
       input[type="text"],
       input[type="number"],
       input[type="password"],
       .form-input {
         font-size: 16px !important;
-        padding: 12px 12px 12px 38px;
-        border-radius: 8px;
-        min-height: 44px;
+        padding: 12px 12px 12px 38px !important;
+        border-radius: 8px !important;
+        min-height: 44px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       select {
         font-size: 16px !important;
         padding: 12px 32px 12px 38px !important;
-        border-radius: 8px;
-        min-height: 44px;
-        background-position: right 10px center;
+        border-radius: 8px !important;
+        min-height: 44px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+        background-position: right 10px center !important;
       }
 
       .input-icon {
-        left: 12px;
-        font-size: 13px;
+        left: 12px !important;
+        font-size: 13px !important;
       }
 
       .form-group {
-        margin-bottom: 14px;
+        margin-bottom: 14px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       label {
-        font-size: 11.5px;
-        margin-bottom: 6px;
+        font-size: 11.5px !important;
+        margin-bottom: 6px !important;
       }
 
       /* Quick selection preset pills */
       .preset-pills {
-        gap: 6px;
-        margin-top: 8px;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        margin-top: 8px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .pill-btn {
-        padding: 5px 10px;
-        font-size: 11px;
-        min-height: 30px;
-        display: inline-flex;
-        align-items: center;
-        border-radius: 14px;
+        padding: 5px 10px !important;
+        font-size: 11px !important;
+        min-height: 30px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        border-radius: 14px !important;
       }
 
       /* Responsive Form Grids: Single column on mobile to prevent squished labels & selects */
       .grid-2 {
-        grid-template-columns: 1fr;
-        gap: 12px;
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       /* Advanced Filters Accordion */
       .filter-toggle-btn {
-        padding: 10px 12px;
-        font-size: 11.5px;
-        min-height: 40px;
-        line-height: 1.35;
-        text-align: left;
+        padding: 10px 12px !important;
+        font-size: 11.5px !important;
+        min-height: 40px !important;
+        line-height: 1.35 !important;
+        text-align: left !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+      }
+
+      .filter-toggle-btn span {
+        min-width: 0 !important;
+        overflow-wrap: break-word !important;
+        word-break: break-word !important;
       }
 
       /* Condition Chips */
       .condition-chips {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 6px;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .chip-checkbox {
-        padding: 8px 8px;
-        font-size: 11px;
-        min-height: 38px;
-        border-radius: 6px;
+        padding: 8px 8px !important;
+        font-size: 11px !important;
+        min-height: 38px !important;
+        border-radius: 6px !important;
+        min-width: 0 !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .chip-checkbox span {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        white-space: nowrap !important;
+        min-width: 0 !important;
       }
 
       /* Switches */
       .switch-group {
-        padding: 12px;
-        margin: 16px 0;
-        gap: 12px;
-        border-radius: 8px;
+        padding: 12px !important;
+        margin: 14px 0 !important;
+        gap: 12px !important;
+        border-radius: 8px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .switch-label {
-        font-size: 12px;
+        font-size: 12px !important;
       }
 
       /* Scrape CTA Button */
       .btn-submit {
-        padding: 14px 16px;
-        font-size: 14.5px;
-        min-height: 48px;
-        border-radius: 10px;
+        padding: 14px 16px !important;
+        font-size: 14.5px !important;
+        min-height: 48px !important;
+        border-radius: 10px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       /* Progress Box */
       .progress-box {
-        padding: 12px;
-        margin-top: 14px;
+        padding: 12px !important;
+        margin-top: 14px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       /* Results Header & Translation Notification */
       .results-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-        margin-bottom: 14px;
-        padding-bottom: 10px;
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 6px !important;
+        margin-bottom: 14px !important;
+        padding-bottom: 10px !important;
+        width: 100% !important;
       }
 
       .results-count {
-        font-size: 16px;
+        font-size: 16px !important;
       }
 
       #elapsedTimeBadge {
-        font-size: 11.5px;
+        font-size: 11.5px !important;
       }
 
       #translationNotice {
@@ -1629,86 +1709,104 @@
         gap: 8px !important;
         padding: 10px 12px !important;
         font-size: 12px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       #flexnetSearchLink {
         margin-left: 0 !important;
         align-self: flex-start !important;
         font-size: 12px !important;
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
       }
 
       /* Vehicles Grid & Cards */
       .cars-grid {
-        grid-template-columns: 1fr;
-        gap: 16px;
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .car-card {
-        border-radius: 12px;
+        border-radius: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .car-media {
-        height: 200px;
+        height: 200px !important;
+        width: 100% !important;
       }
 
       .car-info {
-        padding: 14px;
+        padding: 14px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .car-title {
-        font-size: 14px;
-        margin-bottom: 6px;
+        font-size: 14px !important;
+        margin-bottom: 6px !important;
       }
 
       .car-price-total {
-        font-size: 18px;
+        font-size: 18px !important;
       }
 
       .specs-grid {
-        gap: 6px 8px;
-        font-size: 11.5px;
-        margin-bottom: 12px;
+        gap: 6px 8px !important;
+        font-size: 11.5px !important;
+        margin-bottom: 12px !important;
+        width: 100% !important;
       }
 
       .car-footer {
-        gap: 8px;
-        margin-top: 12px;
+        gap: 8px !important;
+        margin-top: 12px !important;
+        width: 100% !important;
+        display: flex !important;
       }
 
       .btn-view, .btn-details {
-        padding: 10px 8px;
-        font-size: 12px;
-        min-height: 42px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 8px;
+        padding: 10px 8px !important;
+        font-size: 12px !important;
+        min-height: 42px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 8px !important;
+        flex: 1 !important;
       }
 
       /* Detail Modal on Mobile */
       .modal-overlay {
-        padding: 10px 8px;
-        align-items: flex-end;
+        padding: 8px !important;
+        align-items: flex-end !important;
+        box-sizing: border-box !important;
       }
 
       .modal-content {
-        max-width: 100%;
-        max-height: 92vh;
-        max-height: 92dvh;
-        padding: 18px 14px;
-        border-radius: 18px 18px 0 0;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: 92vh !important;
+        max-height: 92dvh !important;
+        padding: 18px 14px !important;
+        border-radius: 18px 18px 0 0 !important;
+        box-sizing: border-box !important;
       }
 
       .modal-header {
-        margin-bottom: 14px;
+        margin-bottom: 14px !important;
+        width: 100% !important;
       }
 
       #modalTitle {
         font-size: 16px !important;
-        line-height: 1.35;
+        line-height: 1.35 !important;
       }
 
       #modalSub {
@@ -1716,12 +1814,12 @@
       }
 
       .modal-close {
-        padding: 6px;
-        min-width: 36px;
-        min-height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        padding: 6px !important;
+        min-width: 36px !important;
+        min-height: 36px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
       }
 
       #modalPriceRow {
@@ -1735,6 +1833,8 @@
         gap: 8px !important;
         font-size: 12px !important;
         margin-bottom: 16px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       #modalSpecsGrid > div {
@@ -1744,102 +1844,120 @@
       #modalEquipment {
         gap: 5px !important;
         margin-bottom: 16px !important;
+        width: 100% !important;
       }
 
       .gallery-strip {
         grid-template-columns: repeat(3, 1fr) !important;
         gap: 6px !important;
         margin-top: 10px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .gallery-strip img {
         height: 75px !important;
         border-radius: 6px !important;
+        width: 100% !important;
       }
 
       /* Password Reset Modal */
       .auth-modal-box {
-        max-width: 100%;
-        border-radius: 16px;
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 16px !important;
+        box-sizing: border-box !important;
       }
 
       .auth-modal-header {
-        padding: 14px 16px;
+        padding: 14px 16px !important;
       }
 
       .auth-modal-body {
-        padding: 16px 14px;
+        padding: 16px 14px !important;
+        box-sizing: border-box !important;
       }
 
       /* Dedicated Login Gatekeeper Screen */
       .gatekeeper-screen {
-        padding: 20px 12px 32px;
-        min-height: 100vh;
-        min-height: 100dvh;
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 16px 12px 28px !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        box-sizing: border-box !important;
       }
 
       .gatekeeper-card {
-        padding: 24px 16px;
-        border-radius: 18px;
-        max-width: 100%;
+        padding: 22px 14px !important;
+        border-radius: 18px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .gatekeeper-emblem-wrap {
-        width: 68px;
-        height: 68px;
-        margin: 0 auto 10px;
+        width: 68px !important;
+        height: 68px !important;
+        margin: 0 auto 10px !important;
       }
 
       .gatekeeper-emblem-wrap img {
-        width: 56px;
-        height: 56px;
+        width: 56px !important;
+        height: 56px !important;
       }
 
       .gatekeeper-status-tag {
-        font-size: 10px;
-        padding: 3px 10px;
-        margin-bottom: 8px;
+        font-size: 10px !important;
+        padding: 3px 10px !important;
+        margin-bottom: 8px !important;
       }
 
       .gatekeeper-title {
-        font-size: 21px;
-        letter-spacing: -0.3px;
-        margin-bottom: 4px;
+        font-size: 21px !important;
+        letter-spacing: -0.3px !important;
+        margin-bottom: 4px !important;
       }
 
       .gatekeeper-sub {
-        font-size: 12px;
-        line-height: 1.4;
+        font-size: 12px !important;
+        line-height: 1.4 !important;
       }
 
       .gatekeeper-tabs {
-        margin-bottom: 16px;
-        border-radius: 10px;
+        margin-bottom: 14px !important;
+        border-radius: 10px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .gatekeeper-tab {
-        padding: 9px;
-        font-size: 12px;
-        min-height: 42px;
+        padding: 9px !important;
+        font-size: 12px !important;
+        min-height: 42px !important;
       }
 
       .gatekeeper-btn-submit {
-        padding: 13px;
-        font-size: 14px;
-        min-height: 46px;
-        border-radius: 10px;
+        padding: 13px !important;
+        font-size: 14px !important;
+        min-height: 46px !important;
+        border-radius: 10px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .gatekeeper-pills-row {
-        gap: 6px;
-        margin-top: 18px;
-        max-width: 100%;
+        gap: 6px !important;
+        margin-top: 16px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
       }
 
       .gatekeeper-pill {
-        font-size: 10.5px;
-        padding: 5px 9px;
-        border-radius: 12px;
+        font-size: 10.5px !important;
+        padding: 5px 9px !important;
+        border-radius: 12px !important;
       }
     }
 
@@ -1848,35 +1966,24 @@
     /* --------------------------------------------------------- */
     @media (max-width: 380px) {
       .container {
-        padding: 10px 8px 40px;
+        padding: 8px 6px 36px !important;
       }
 
       .glass-panel {
-        padding: 14px 10px;
+        padding: 12px 10px !important;
       }
 
       .brand-title {
-        font-size: 15px;
-      }
-
-      .system-status {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .status-badge, .auth-user-pill {
-        justify-content: center;
-        width: 100%;
-        margin-left: 0;
+        font-size: 15px !important;
       }
 
       .condition-chips {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr !important;
       }
 
       .specs-grid {
-        grid-template-columns: 1fr;
-        gap: 5px;
+        grid-template-columns: 1fr !important;
+        gap: 5px !important;
       }
 
       #modalSpecsGrid {
@@ -1892,11 +1999,11 @@
       }
 
       .car-footer {
-        flex-direction: column;
+        flex-direction: column !important;
       }
 
       .btn-view, .btn-details {
-        width: 100%;
+        width: 100% !important;
       }
     }
   </style>
