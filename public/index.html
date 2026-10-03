@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Flexnet Japan Vehicle Scraper | JDM Intelligence</title>
   <meta name="description" content="Search, scrape and synchronize Japanese Land Cruisers, Hiaces, and custom vehicles from Flexnet Japan directly into Supabase and Google Sheets.">
   <meta name="build-version" content="2.0.1-node-serverless">
@@ -151,12 +151,6 @@
       display: grid;
       grid-template-columns: 420px 1fr;
       gap: 28px;
-    }
-
-    @media (max-width: 980px) {
-      .app-layout {
-        grid-template-columns: 1fr;
-      }
     }
 
     /* Panel Card */
@@ -1297,6 +1291,612 @@
       to {
         opacity: 1;
         transform: translateY(0);
+      }
+    }
+
+    /* ========================================================= */
+    /* COMPREHENSIVE RESPONSIVE DESIGN & MOBILE OPTIMIZATIONS     */
+    /* ========================================================= */
+
+    /* Global viewport & overflow containment */
+    html {
+      -webkit-text-size-adjust: 100%;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100%;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    img, svg, video {
+      max-width: 100%;
+      height: auto;
+    }
+
+    button, input, select, textarea, .pill-btn, .tab-btn, .chip-checkbox, .btn-submit {
+      touch-action: manipulation;
+    }
+
+    /* --------------------------------------------------------- */
+    /* Large Tablets & Medium Displays (<= 1024px)               */
+    /* --------------------------------------------------------- */
+    @media (max-width: 1024px) {
+      .container {
+        padding: 20px 16px 70px;
+      }
+      .app-layout {
+        grid-template-columns: 380px 1fr;
+        gap: 20px;
+      }
+      .glass-panel {
+        padding: 20px;
+      }
+      .cars-grid {
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+      }
+    }
+
+    /* --------------------------------------------------------- */
+    /* Tablets, Phablets & Mobile Landscape (<= 900px)           */
+    /* --------------------------------------------------------- */
+    @media (max-width: 900px) {
+      .app-layout {
+        grid-template-columns: 1fr;
+        gap: 22px;
+      }
+
+      header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        padding: 16px 18px;
+        margin-bottom: 22px;
+      }
+
+      .logo-group {
+        justify-content: flex-start;
+      }
+
+      .system-status {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+        width: 100%;
+        padding-top: 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .auth-user-pill {
+        margin-left: auto;
+      }
+    }
+
+    /* --------------------------------------------------------- */
+    /* Standard Smartphones (<= 640px)                           */
+    /* --------------------------------------------------------- */
+    @media (max-width: 640px) {
+      body {
+        background-attachment: scroll; /* Fix iOS fixed background lag */
+      }
+
+      .container {
+        padding: 12px 12px max(50px, env(safe-area-inset-bottom, 20px));
+      }
+
+      /* Mobile Header */
+      header {
+        padding: 14px 14px;
+        border-radius: 12px;
+        margin-bottom: 16px;
+        gap: 12px;
+      }
+
+      .logo-group {
+        gap: 10px;
+      }
+
+      .logo-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+      }
+
+      .brand-svg-logo {
+        width: 34px;
+        height: 34px;
+      }
+
+      .brand-title {
+        font-size: 16px;
+        line-height: 1.3;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 6px;
+      }
+
+      .jdm-kanji-badge {
+        font-size: 9px;
+        padding: 2px 6px;
+        margin-left: 0;
+      }
+
+      .brand-subtitle {
+        font-size: 11px;
+        line-height: 1.3;
+      }
+
+      .system-status {
+        padding-top: 10px;
+        gap: 6px;
+      }
+
+      .status-badge {
+        padding: 4px 8px;
+        font-size: 11px;
+        gap: 6px;
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+      }
+
+      .auth-user-pill {
+        padding: 4px 8px;
+        font-size: 11px;
+        gap: 6px;
+        margin-left: 0;
+      }
+
+      .auth-role-tag {
+        font-size: 9px;
+        padding: 2px 5px;
+      }
+
+      .btn-auth-logout {
+        padding: 6px 4px;
+        min-width: 24px;
+        min-height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      /* Panels */
+      .glass-panel {
+        padding: 16px 14px;
+        border-radius: 14px;
+      }
+
+      .panel-title {
+        font-size: 16px;
+        gap: 8px;
+      }
+
+      .panel-subtitle {
+        font-size: 12px;
+        margin-bottom: 16px;
+        line-height: 1.4;
+      }
+
+      .tab-bar {
+        margin-bottom: 16px;
+        padding: 3px;
+      }
+
+      .tab-btn {
+        padding: 9px 8px;
+        font-size: 12.5px;
+        min-height: 40px;
+      }
+
+      /* Touch-friendly inputs & 16px font to prevent iOS Safari auto-zoom */
+      input[type="text"],
+      input[type="number"],
+      input[type="password"],
+      .form-input {
+        font-size: 16px !important;
+        padding: 12px 12px 12px 38px;
+        border-radius: 8px;
+        min-height: 44px;
+      }
+
+      select {
+        font-size: 16px !important;
+        padding: 12px 32px 12px 38px !important;
+        border-radius: 8px;
+        min-height: 44px;
+        background-position: right 10px center;
+      }
+
+      .input-icon {
+        left: 12px;
+        font-size: 13px;
+      }
+
+      .form-group {
+        margin-bottom: 14px;
+      }
+
+      label {
+        font-size: 11.5px;
+        margin-bottom: 6px;
+      }
+
+      /* Quick selection preset pills */
+      .preset-pills {
+        gap: 6px;
+        margin-top: 8px;
+      }
+
+      .pill-btn {
+        padding: 5px 10px;
+        font-size: 11px;
+        min-height: 30px;
+        display: inline-flex;
+        align-items: center;
+        border-radius: 14px;
+      }
+
+      /* Responsive Form Grids: Single column on mobile to prevent squished labels & selects */
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      /* Advanced Filters Accordion */
+      .filter-toggle-btn {
+        padding: 10px 12px;
+        font-size: 11.5px;
+        min-height: 40px;
+        line-height: 1.35;
+        text-align: left;
+      }
+
+      /* Condition Chips */
+      .condition-chips {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px;
+      }
+
+      .chip-checkbox {
+        padding: 8px 8px;
+        font-size: 11px;
+        min-height: 38px;
+        border-radius: 6px;
+      }
+
+      .chip-checkbox span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      /* Switches */
+      .switch-group {
+        padding: 12px;
+        margin: 16px 0;
+        gap: 12px;
+        border-radius: 8px;
+      }
+
+      .switch-label {
+        font-size: 12px;
+      }
+
+      /* Scrape CTA Button */
+      .btn-submit {
+        padding: 14px 16px;
+        font-size: 14.5px;
+        min-height: 48px;
+        border-radius: 10px;
+      }
+
+      /* Progress Box */
+      .progress-box {
+        padding: 12px;
+        margin-top: 14px;
+      }
+
+      /* Results Header & Translation Notification */
+      .results-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        margin-bottom: 14px;
+        padding-bottom: 10px;
+      }
+
+      .results-count {
+        font-size: 16px;
+      }
+
+      #elapsedTimeBadge {
+        font-size: 11.5px;
+      }
+
+      #translationNotice {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+        padding: 10px 12px !important;
+        font-size: 12px !important;
+      }
+
+      #flexnetSearchLink {
+        margin-left: 0 !important;
+        align-self: flex-start !important;
+        font-size: 12px !important;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      /* Vehicles Grid & Cards */
+      .cars-grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .car-card {
+        border-radius: 12px;
+      }
+
+      .car-media {
+        height: 200px;
+      }
+
+      .car-info {
+        padding: 14px;
+      }
+
+      .car-title {
+        font-size: 14px;
+        margin-bottom: 6px;
+      }
+
+      .car-price-total {
+        font-size: 18px;
+      }
+
+      .specs-grid {
+        gap: 6px 8px;
+        font-size: 11.5px;
+        margin-bottom: 12px;
+      }
+
+      .car-footer {
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .btn-view, .btn-details {
+        padding: 10px 8px;
+        font-size: 12px;
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+      }
+
+      /* Detail Modal on Mobile */
+      .modal-overlay {
+        padding: 10px 8px;
+        align-items: flex-end;
+      }
+
+      .modal-content {
+        max-width: 100%;
+        max-height: 92vh;
+        max-height: 92dvh;
+        padding: 18px 14px;
+        border-radius: 18px 18px 0 0;
+      }
+
+      .modal-header {
+        margin-bottom: 14px;
+      }
+
+      #modalTitle {
+        font-size: 16px !important;
+        line-height: 1.35;
+      }
+
+      #modalSub {
+        font-size: 12px !important;
+      }
+
+      .modal-close {
+        padding: 6px;
+        min-width: 36px;
+        min-height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #modalPriceRow {
+        font-size: 17px !important;
+        margin-bottom: 14px !important;
+        padding-bottom: 10px !important;
+      }
+
+      #modalSpecsGrid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        font-size: 12px !important;
+        margin-bottom: 16px !important;
+      }
+
+      #modalSpecsGrid > div {
+        padding: 6px 10px !important;
+      }
+
+      #modalEquipment {
+        gap: 5px !important;
+        margin-bottom: 16px !important;
+      }
+
+      .gallery-strip {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 6px !important;
+        margin-top: 10px !important;
+      }
+
+      .gallery-strip img {
+        height: 75px !important;
+        border-radius: 6px !important;
+      }
+
+      /* Password Reset Modal */
+      .auth-modal-box {
+        max-width: 100%;
+        border-radius: 16px;
+      }
+
+      .auth-modal-header {
+        padding: 14px 16px;
+      }
+
+      .auth-modal-body {
+        padding: 16px 14px;
+      }
+
+      /* Dedicated Login Gatekeeper Screen */
+      .gatekeeper-screen {
+        padding: 20px 12px 32px;
+        min-height: 100vh;
+        min-height: 100dvh;
+      }
+
+      .gatekeeper-card {
+        padding: 24px 16px;
+        border-radius: 18px;
+        max-width: 100%;
+      }
+
+      .gatekeeper-emblem-wrap {
+        width: 68px;
+        height: 68px;
+        margin: 0 auto 10px;
+      }
+
+      .gatekeeper-emblem-wrap img {
+        width: 56px;
+        height: 56px;
+      }
+
+      .gatekeeper-status-tag {
+        font-size: 10px;
+        padding: 3px 10px;
+        margin-bottom: 8px;
+      }
+
+      .gatekeeper-title {
+        font-size: 21px;
+        letter-spacing: -0.3px;
+        margin-bottom: 4px;
+      }
+
+      .gatekeeper-sub {
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .gatekeeper-tabs {
+        margin-bottom: 16px;
+        border-radius: 10px;
+      }
+
+      .gatekeeper-tab {
+        padding: 9px;
+        font-size: 12px;
+        min-height: 42px;
+      }
+
+      .gatekeeper-btn-submit {
+        padding: 13px;
+        font-size: 14px;
+        min-height: 46px;
+        border-radius: 10px;
+      }
+
+      .gatekeeper-pills-row {
+        gap: 6px;
+        margin-top: 18px;
+        max-width: 100%;
+      }
+
+      .gatekeeper-pill {
+        font-size: 10.5px;
+        padding: 5px 9px;
+        border-radius: 12px;
+      }
+    }
+
+    /* --------------------------------------------------------- */
+    /* Compact / Small Mobile Displays (<= 380px)                */
+    /* --------------------------------------------------------- */
+    @media (max-width: 380px) {
+      .container {
+        padding: 10px 8px 40px;
+      }
+
+      .glass-panel {
+        padding: 14px 10px;
+      }
+
+      .brand-title {
+        font-size: 15px;
+      }
+
+      .system-status {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .status-badge, .auth-user-pill {
+        justify-content: center;
+        width: 100%;
+        margin-left: 0;
+      }
+
+      .condition-chips {
+        grid-template-columns: 1fr;
+      }
+
+      .specs-grid {
+        grid-template-columns: 1fr;
+        gap: 5px;
+      }
+
+      #modalSpecsGrid {
+        grid-template-columns: 1fr !important;
+      }
+
+      .gallery-strip {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+
+      .gallery-strip img {
+        height: 85px !important;
+      }
+
+      .car-footer {
+        flex-direction: column;
+      }
+
+      .btn-view, .btn-details {
+        width: 100%;
       }
     }
   </style>
